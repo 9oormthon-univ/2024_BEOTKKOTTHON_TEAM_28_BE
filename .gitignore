@@ -9,6 +9,7 @@
 src/main/resources/application.yml
 
 .idea
+HELP.md
 
 # User-specific stuff
 .idea/**/workspace.xml
