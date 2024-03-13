@@ -8,6 +8,8 @@
 # Credentials
 src/main/resources/application.yml
 
+.idea
+
 # User-specific stuff
 .idea/**/workspace.xml
 .idea/**/tasks.xml
