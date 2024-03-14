@@ -29,7 +29,7 @@ jobs:
         with:
           file: ./Dockerfile
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPOSITORY }}
+          tags: jeongheumchoi/startup-valley-server:0.0.1
 
   cd:
     needs: [ci]
