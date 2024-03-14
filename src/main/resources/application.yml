@@ -1,0 +1,9 @@
+spring.profiles.default: local
+
+---
+
+spring.config.active.on-profile: local
+
+---
+
+spring.config.active.on-profile: prod
