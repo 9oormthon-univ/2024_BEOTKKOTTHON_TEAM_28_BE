@@ -24,6 +24,8 @@ jobs:
         run: |
           cd src/main/resources
           echo "${{ secrets.APPLICATION_PROD }}" > ./application-prod.yml
+          ls -l ./application-prod.yml
+          cat ./application-prod.yml
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@ec92e829475ac0c2315ea8f9eced72db85bb337a # v3.0.0
