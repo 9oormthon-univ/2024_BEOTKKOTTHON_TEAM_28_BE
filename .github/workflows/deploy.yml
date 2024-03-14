@@ -60,4 +60,4 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           port: ${{ 22 }}
           script: |
-            sh deploy.sh
+            sh /home/ubuntu/deploy.sh
