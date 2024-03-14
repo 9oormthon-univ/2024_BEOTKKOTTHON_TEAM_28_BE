@@ -1,0 +1,4 @@
+[submodule "startup-valley-properties"]
+	path = startup-valley-properties
+	url = https://github.com/JeongHeumChoi/startup-valley-properties.git
+	branch = main
