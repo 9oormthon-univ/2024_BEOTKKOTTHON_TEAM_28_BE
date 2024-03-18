@@ -11,7 +11,6 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<User, Long> {
     @Query("select u.id as id, u.role as role, u.password as password from User u where u.serialId = :serialId")
     Optional<UserSecurityForm> findUserSecurityFromBySerialId(String serialId);
-
     @Query("select u.id as id, u.role as role, u.password as password from User u where u.id = :id")
     Optional<UserSecurityForm> findUserSecurityFromById(Long id);
     Optional<User> findByIdAndRefreshToken(Long id, String refreshToken);
