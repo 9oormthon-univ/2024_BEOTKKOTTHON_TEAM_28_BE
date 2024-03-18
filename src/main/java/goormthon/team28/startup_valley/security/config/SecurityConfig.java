@@ -24,14 +24,14 @@ import org.springframework.security.web.authentication.logout.LogoutFilter;
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
+    private final JwtUtil jwtUtil;
+    private final JwtAuthenticationManager jwtAuthenticationManager;
     private final DefaultSuccessHandler defaultSuccessHandler;
     private final DefaultFailureHandler defaultFailureHandler;
     private final CustomLogoutProcessHandler customLogoutProcessHandler;
     private final CustomLogoutResultHandler customLogoutResultHandler;
     private final CustomAccessDeniedHandler customAccessDeniedHandler;
     private final CustomAuthenticationEntryPointHandler customAuthenticationEntryPointHandler;
-    private final JwtUtil jwtUtil;
-    private final JwtAuthenticationManager jwtAuthenticationManager;
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
