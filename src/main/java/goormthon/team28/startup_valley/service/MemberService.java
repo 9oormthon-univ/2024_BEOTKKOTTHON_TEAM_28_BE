@@ -16,10 +16,11 @@ public class MemberService {
     private final MemberRepository memberRepository;
     @Transactional
     public Member saveMember(Team team, User user){
-        return memberRepository.save(Member.builder()
+        return memberRepository.findByTeamAndUser(team, user)
+                .orElseGet(() -> memberRepository.save(Member.builder()
                         .team(team)
                         .user(user)
-                .build()
-        );
+                        .build())
+                );
     }
 }
