@@ -16,5 +16,4 @@ public interface TeamRepository extends JpaRepository<Team, Long> {
     @Modifying(clearAutomatically = true)
     @Query("update Team t set t.leader = :leader where t.id = :teamId")
     void updateLeader(Long teamId, Member leader);
-
 }
