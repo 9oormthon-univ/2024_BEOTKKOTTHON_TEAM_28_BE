@@ -10,6 +10,6 @@ import java.util.List;
 
 @Repository
 public interface QuestionRepository extends JpaRepository<Question, Long> {
-    List<Question> findByReceiverAndStatus(Member member, EQuestionStatus eQuestionStatus);
+    List<Question> findAllByReceiverAndStatus(Member member, EQuestionStatus eQuestionStatus);
     boolean existsByCode(String code);
 }
