@@ -43,20 +43,20 @@ public class SecurityConfig {
                 .authorizeHttpRequests(request ->
                         request
                                 .requestMatchers("/login").permitAll()
-                                .requestMatchers("/api/v1/auth/**").permitAll()
-                                .requestMatchers("/api/users/**").hasAnyRole("USER")
+                                .requestMatchers("/api/auth/**").permitAll()
+                                .requestMatchers("/api/**").hasAnyRole("USER")
                                 .anyRequest().authenticated()
                 )
                 .formLogin(login -> login
                         .loginPage("/login")
-                        .loginProcessingUrl("/api/v1/auth/sign-in")
+                        .loginProcessingUrl("/api/auth/sign-in")
                         .usernameParameter("serial_id")
                         .passwordParameter("password")
                         .successHandler(defaultSuccessHandler)
                         .failureHandler(defaultFailureHandler)
                 )
                 .logout(logout -> logout
-                        .logoutUrl("/api/v1/auth/logout")
+                        .logoutUrl("/api/users/sign-out")
                         .addLogoutHandler(customLogoutProcessHandler)
                         .logoutSuccessHandler(customLogoutResultHandler)
                 )
