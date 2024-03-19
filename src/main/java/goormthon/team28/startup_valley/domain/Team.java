@@ -21,12 +21,14 @@ public class Team {
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(name = "guild_id", nullable = false, unique = true)
+    private String guildId;
     @Column(name = "name", nullable = false)
     private String name;
     @Column(name = "team_image")
     private String teamImage;
     @OneToOne
-    @JoinColumn(name = "member_id")
+    @JoinColumn(name = "leader_id")
     private Member leader;
     @Column(name = "start_at", nullable = false)
     private LocalDate startAt;
@@ -38,7 +40,8 @@ public class Team {
     @Column(name = "is_public", nullable = false)
     private Boolean isPublic;
     @Builder
-    public Team(String name, String teamImage, LocalDate startAt, EProjectStatus status, Boolean isPublic) {
+    public Team(String guildId, String name, String teamImage, LocalDate startAt, EProjectStatus status, Boolean isPublic) {
+        this.guildId = guildId;
         this.name = name;
         this.teamImage = teamImage;
         this.startAt = startAt;

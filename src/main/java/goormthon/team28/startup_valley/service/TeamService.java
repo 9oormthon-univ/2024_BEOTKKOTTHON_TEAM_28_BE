@@ -18,15 +18,18 @@ import java.time.LocalDate;
 public class TeamService {
     private final TeamRepository teamRepository;
     @Transactional
-    public Team saveTeam(String name, String image, LocalDate now ){
-        return teamRepository.save(Team.builder()
-                .name(name)
-                .teamImage(image)
-                .startAt(now)
-                .status(EProjectStatus.IN_PROGRESS)
-                .isPublic(true)
-                .build()
-        );
+    public Team saveTeam(String guildId, String name, String image, LocalDate now){
+        return teamRepository.findByGuildId(guildId)
+                .orElseGet(() -> teamRepository.save(
+                        Team.builder()
+                                .guildId(guildId)
+                                .name(name)
+                                .teamImage(image)
+                                .startAt(now)
+                                .status(EProjectStatus.IN_PROGRESS)
+                                .isPublic(true)
+                                .build())
+                );
     }
     @Transactional
     public void updateLeader(Long teamId, Member member){
