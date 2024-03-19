@@ -51,10 +51,15 @@ public class MemberService {
 
     @Transactional
     public Member saveMember(Team team, User user){
-        return memberRepository.save(Member.builder()
+        return memberRepository.findByTeamAndUser(team, user)
+                .orElseGet(() -> memberRepository.save(Member.builder()
                         .team(team)
                         .user(user)
-                .build()
-        );
+                        .build())
+                );
+    }
+    public Member findByTeamAndUser(Team team, User user){
+        return memberRepository.findByTeamAndUser(team, user)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_MEMBER));
     }
 }

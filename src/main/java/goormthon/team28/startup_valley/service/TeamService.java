@@ -4,6 +4,8 @@ import goormthon.team28.startup_valley.domain.Member;
 import goormthon.team28.startup_valley.domain.Team;
 import goormthon.team28.startup_valley.domain.User;
 import goormthon.team28.startup_valley.dto.type.EProjectStatus;
+import goormthon.team28.startup_valley.exception.CommonException;
+import goormthon.team28.startup_valley.exception.ErrorCode;
 import goormthon.team28.startup_valley.repository.TeamRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,15 +20,22 @@ import java.time.LocalDate;
 public class TeamService {
     private final TeamRepository teamRepository;
     @Transactional
-    public Team saveTeam(String name, String image, LocalDate now ){
-        return teamRepository.save(Team.builder()
-                .name(name)
-                .teamImage(image)
-                .startAt(now)
-                .status(EProjectStatus.IN_PROGRESS)
-                .isPublic(true)
-                .build()
-        );
+    public Team saveTeam(String guildId, String name, String image, LocalDate now){
+        return teamRepository.findByGuildId(guildId)
+                .orElseGet(() -> teamRepository.save(
+                        Team.builder()
+                                .guildId(guildId)
+                                .name(name)
+                                .teamImage(image)
+                                .startAt(now)
+                                .status(EProjectStatus.IN_PROGRESS)
+                                .isPublic(true)
+                                .build())
+                );
+    }
+    public Team findByGuildId(String guildId) {
+        return teamRepository.findByGuildId(guildId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_TEAM));
     }
     @Transactional
     public void updateLeader(Long teamId, Member member){

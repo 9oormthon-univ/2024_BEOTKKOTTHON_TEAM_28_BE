@@ -11,4 +11,5 @@ import java.util.List;
 @Repository
 public interface QuestionRepository extends JpaRepository<Question, Long> {
     List<Question> findAllByReceiverAndStatus(Member member, EQuestionStatus eQuestionStatus);
+    boolean existsByCode(String code);
 }

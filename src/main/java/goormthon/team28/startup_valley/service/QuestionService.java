@@ -3,6 +3,7 @@ package goormthon.team28.startup_valley.service;
 
 import goormthon.team28.startup_valley.domain.Member;
 import goormthon.team28.startup_valley.domain.Question;
+import goormthon.team28.startup_valley.domain.Team;
 import goormthon.team28.startup_valley.domain.User;
 import goormthon.team28.startup_valley.dto.response.QuestionDto;
 import goormthon.team28.startup_valley.dto.response.QuestionListDto;
@@ -13,10 +14,13 @@ import goormthon.team28.startup_valley.repository.MemberRepository;
 import goormthon.team28.startup_valley.repository.QuestionRepository;
 import goormthon.team28.startup_valley.repository.TeamRepository;
 import goormthon.team28.startup_valley.repository.UserRepository;
+import goormthon.team28.startup_valley.util.NumberUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Slf4j
@@ -28,6 +32,26 @@ public class QuestionService {
     private final UserRepository userRepository;
     private final TeamRepository teamRepository;
     private final MemberRepository memberRepository;
+    private final TeamService teamService;
+    private final MemberService memberService;
+    private final UserService userService;
+    @Transactional
+    public Question saveQuestion(String guildId, String senderId, String receiverId, String content, LocalDateTime time){
+        String code = NumberUtil.generateRandomCode();
+        while(questionRepository.existsByCode(code)){
+            code = NumberUtil.generateRandomCode();
+        }
+        Team findTeam = teamService.findByGuildId(guildId);
+        return questionRepository.save(Question.builder()
+                        .sender(memberService.findByTeamAndUser(findTeam, userService.findBySerialId(senderId)))
+                        .receiver(memberService.findByTeamAndUser(findTeam, userService.findBySerialId(receiverId)))
+                        .content(content)
+                        .status(EQuestionStatus.WAITING_ANSWER)
+                        .createdAt(time)
+                        .code(code)
+                .build()
+        );
+    }
 
     public QuestionListDto listWaitingQuestion(Long userId, Long teamsId) {
         User currentUser = userRepository.findById(userId)
