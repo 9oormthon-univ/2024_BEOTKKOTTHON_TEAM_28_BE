@@ -47,6 +47,9 @@ dependencies {
 
 	//json
 	implementation 'net.minidev:json-smart:2.4.7'
+
+	// discord bot
+	implementation 'net.dv8tion:JDA:5.0.0-beta.5'
 }
 
 task copyGitSubmodule(type: Copy) {

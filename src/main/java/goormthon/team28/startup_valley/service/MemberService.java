@@ -2,6 +2,7 @@ package goormthon.team28.startup_valley.service;
 
 import goormthon.team28.startup_valley.domain.Member;
 import goormthon.team28.startup_valley.domain.Team;
+import goormthon.team28.startup_valley.domain.User;
 import goormthon.team28.startup_valley.dto.response.MemberDto;
 import goormthon.team28.startup_valley.dto.response.MemberListDto;
 import goormthon.team28.startup_valley.exception.CommonException;
@@ -11,6 +12,7 @@ import goormthon.team28.startup_valley.repository.TeamRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -40,5 +42,14 @@ public class MemberService {
                 .toList();
 
         return MemberListDto.of(memberDtoList, memberDtoList.size());
+    }
+
+    @Transactional
+    public Member saveMember(Team team, User user){
+        return memberRepository.save(Member.builder()
+                        .team(team)
+                        .user(user)
+                .build()
+        );
     }
 }

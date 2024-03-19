@@ -2,6 +2,7 @@ package goormthon.team28.startup_valley.repository;
 
 import goormthon.team28.startup_valley.domain.User;
 import goormthon.team28.startup_valley.dto.type.ERole;
+import org.springframework.data.domain.Example;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -18,6 +19,10 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("update User u set u.refreshToken = :refreshToken where u.id = :userId")
     void updateRefreshTokenAndLoginStatus(Long userId, String refreshToken);
     Optional<User> findById(Long userId);
+    Optional<User> findBySerialId(String serialId);
+
+    boolean existsBySerialId(String serialId);
+
     interface UserSecurityForm {
         Long getId();
         ERole getRole();

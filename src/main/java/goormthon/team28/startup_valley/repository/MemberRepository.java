@@ -13,6 +13,5 @@ import java.util.Optional;
 public interface MemberRepository extends JpaRepository<Member, Long> {
     Optional<Member> findByIdAndUser(Long teamId, User user);
     Boolean existsByUserId(Long userId);
-
     List<Member> findByTeam(Team team);
 }
