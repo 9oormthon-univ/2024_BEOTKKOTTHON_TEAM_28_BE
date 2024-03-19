@@ -25,7 +25,6 @@ public class CustomLogoutResultHandler implements LogoutSuccessHandler {
         }
         CookieUtil.deleteCookie(request, response, Constants.ACCESS_COOKIE_NAME);
         CookieUtil.deleteCookie(request, response, Constants.REFRESH_COOKIE_NAME);
-
         AuthenticationResponse.makeSuccessResponse(response);
     }
 }
