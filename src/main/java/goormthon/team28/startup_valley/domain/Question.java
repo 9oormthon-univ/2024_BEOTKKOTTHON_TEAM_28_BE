@@ -3,6 +3,7 @@ package goormthon.team28.startup_valley.domain;
 import goormthon.team28.startup_valley.dto.type.EQuestionStatus;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicUpdate;
@@ -32,4 +33,15 @@ public class Question {
     @Column(name = "question_status", nullable = false)
     @Enumerated(EnumType.STRING)
     private EQuestionStatus status;
+    @Column(name = "code", unique = true)
+    private String code;
+    @Builder
+    public Question(Member sender, Member receiver, String content, LocalDateTime createdAt, EQuestionStatus status, String code) {
+        this.sender = sender;
+        this.receiver = receiver;
+        this.content = content;
+        this.createdAt = createdAt;
+        this.status = status;
+        this.code = code;
+    }
 }
