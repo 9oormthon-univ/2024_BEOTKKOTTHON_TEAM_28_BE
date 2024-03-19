@@ -40,7 +40,7 @@ public class QuestionService {
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_MEMBER));
 
         List<Question> questionList = questionRepository
-                .findByReceiverAndStatus(member, EQuestionStatus.WAITING_ANSWER);
+                .findAllByReceiverAndStatus(member, EQuestionStatus.WAITING_ANSWER);
         List<QuestionDto> questionDtoList = questionList.stream()
                 .map(question -> QuestionDto.of(
                         question.getId(),
