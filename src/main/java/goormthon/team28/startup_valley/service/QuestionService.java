@@ -49,6 +49,6 @@ public class QuestionService {
                         question.getSender().getUser().getProfileImage()
                 )).toList();
 
-        return QuestionListDto.of(questionDtoList, questionList.size());
+        return QuestionListDto.of(questionDtoList, questionDtoList.size());
     }
 }
