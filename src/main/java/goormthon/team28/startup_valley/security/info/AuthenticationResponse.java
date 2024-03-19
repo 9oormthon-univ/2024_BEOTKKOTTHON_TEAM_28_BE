@@ -14,11 +14,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class AuthenticationResponse {
-    public static void makeLoginSuccessResponse(HttpServletResponse response, JwtTokenDto jwtTokenDto, Integer refreshExpiration){
+
+    public static void makeLoginSuccessResponse(HttpServletResponse response, JwtTokenDto jwtTokenDto, Integer refreshExpiration) throws IOException {
         CookieUtil.addCookie(response, Constants.ACCESS_COOKIE_NAME, jwtTokenDto.accessToken());
         CookieUtil.addSecureCookie(response, Constants.REFRESH_COOKIE_NAME, jwtTokenDto.refreshToken(), refreshExpiration);
+
+        makeSuccessResponse(response);
     }
-    public static void makeLogoutSuccessResponse(HttpServletResponse response) throws IOException {
+    public static void makeSuccessResponse(HttpServletResponse response) throws IOException {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         response.setStatus(HttpStatus.OK.value());

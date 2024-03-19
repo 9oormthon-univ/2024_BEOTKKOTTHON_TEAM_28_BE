@@ -26,7 +26,7 @@ public class User {
     private String serialId; // discord serial id
     @Column(name = "password", nullable = false)
     private String password;
-    @Column(name = "discord_id", nullable = true)
+    @Column(name = "discord_id")
     private Long discordId;
     @Column(name = "role", nullable = false)
     @Enumerated(EnumType.STRING)
@@ -41,15 +41,15 @@ public class User {
     @Column(name = "refresh_Token")
     private String refreshToken;
     @Builder
-    public User(String serialId, String password, ERole role, String nickname, EProfileImage profileImage, String refreshToken) {
+    public User(String serialId, String password, ERole role, String nickname, EProfileImage profileImage) {
         this.serialId = serialId;
         this.password = password;
         this.role = role;
         this.nickname = nickname;
         this.profileImage = profileImage;
-        this.refreshToken = refreshToken;
     }
-    public void doubleCheck(Long discordId){
-        this.discordId = discordId;
+
+    public void updateRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
     }
 }
