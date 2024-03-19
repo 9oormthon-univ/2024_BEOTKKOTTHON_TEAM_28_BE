@@ -4,6 +4,8 @@ import goormthon.team28.startup_valley.domain.Member;
 import goormthon.team28.startup_valley.domain.Team;
 import goormthon.team28.startup_valley.domain.User;
 import goormthon.team28.startup_valley.dto.type.EProjectStatus;
+import goormthon.team28.startup_valley.exception.CommonException;
+import goormthon.team28.startup_valley.exception.ErrorCode;
 import goormthon.team28.startup_valley.repository.TeamRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,6 +32,10 @@ public class TeamService {
                                 .isPublic(true)
                                 .build())
                 );
+    }
+    public Team findByGuildId(String guildId) {
+        return teamRepository.findByGuildId(guildId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_TEAM));
     }
     @Transactional
     public void updateLeader(Long teamId, Member member){
