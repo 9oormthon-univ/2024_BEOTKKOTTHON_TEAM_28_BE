@@ -39,11 +39,11 @@ public class DiscordListener extends ListenerAdapter {
                 // DB에 가입 안한 사용자 이름 목록 가져오기
                 List<String> noSignUp = findNoSignUp(discordMembers);
                 if (noSignUp.isEmpty()){ // 모두 회원가입을 한 경우
-                    // 팀을 생성한다
-                    Team team = teamService.saveTeam(event.getGuild().getName(), event.getGuild().getIconUrl(), now);
+                    // 팀을 생성하거나 조회한다
+                    Team team = teamService.saveTeam(event.getGuild().getId(), event.getGuild().getName(), event.getGuild().getIconUrl(), now);
                     log.info("팀 생성 완료");
 
-                    // 팀의 멤버를 생성한다.
+                    // 팀의 멤버를 생성하거나 조회한다.
                     discordMembers.forEach(
                             discordMember -> {
                                 goormthon.team28.startup_valley.domain.Member teamMember = memberService.saveMember(
@@ -56,7 +56,7 @@ public class DiscordListener extends ListenerAdapter {
                             }
                     );
                     log.info("멤버 생성 완료");
-                    event.reply("팀 과 팀 멤버를 생성했어요! 좋은 협업이 되길 기대합니다!").setEphemeral(true).queue();
+                    event.reply("팀 과 팀 멤버를 연결했어요! 좋은 협업이 되길 기대합니다!").setEphemeral(true).queue();
                 } else {
                     event.reply("웹에 회원가입이 필요합니다!\n\n" + "회원가입 해주세요 !! : " + noSignUp.toString()).setEphemeral(true).queue();
                 }
