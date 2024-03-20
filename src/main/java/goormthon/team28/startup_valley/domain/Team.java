@@ -6,9 +6,6 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.DynamicUpdate;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 
@@ -37,16 +34,13 @@ public class Team {
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
     private EProjectStatus status;
-    @Column(name = "is_public", nullable = false)
-    private Boolean isPublic;
     @Builder
-    public Team(String guildId, String name, String teamImage, LocalDate startAt, EProjectStatus status, Boolean isPublic) {
+    public Team(String guildId, String name, String teamImage, LocalDate startAt, EProjectStatus status) {
         this.guildId = guildId;
         this.name = name;
         this.teamImage = teamImage;
         this.startAt = startAt;
         this.status = status;
-        this.isPublic = isPublic;
     }
 
     public void changeTeamLeader(Member leader) {
