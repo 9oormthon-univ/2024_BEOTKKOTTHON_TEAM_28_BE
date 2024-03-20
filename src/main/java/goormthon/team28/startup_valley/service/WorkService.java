@@ -36,6 +36,15 @@ public class WorkService {
                 .build()
         );
     }
+    @Transactional
+    public void updateWorkAfterOver(Long workId, String works, LocalDateTime overTime){
+        workRepository.updateWorkAfterOver(workId, works, overTime);
+    }
+    public Work findById(Long workId){
+        return workRepository.findById(workId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_WORK));
+    }
+
     public Optional<Work> findNotOverWork(Scrum scrum, Member member){
         return workRepository.findByScrumAndOwnerAndEndAtIsNull(scrum, member);
     }

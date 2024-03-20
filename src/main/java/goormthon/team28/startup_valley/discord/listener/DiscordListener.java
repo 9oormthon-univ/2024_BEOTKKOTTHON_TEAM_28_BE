@@ -20,11 +20,14 @@ import org.hibernate.Hibernate;
 import org.springframework.transaction.annotation.Transactional;
 
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -72,6 +75,7 @@ public class DiscordListener extends ListenerAdapter {
                     event.reply("웹에 회원가입이 필요합니다!\n\n" + "회원가입 해주세요 !! : " + noSignUp.toString()).setEphemeral(true).queue();
                 }
                 break;
+
             case "질문하기":
                 String guildId = event.getGuild().getId();
                 String senderId = event.getMember().getUser().getName();
@@ -92,19 +96,15 @@ public class DiscordListener extends ListenerAdapter {
                         .queue();
 
                 break;
+
             case "답변하기":
                 String code = event.getOption("code").getAsString();
                 Member maker = event.getOption("receiver").getAsMember();
                 String answerContent = event.getOption("answer_content").getAsString();
 
                 Question findQuestion = questionService.findByCode(code);
-                // member 추가하기 builder
-                answerService.saveAnswer(findQuestion,
-                        memberService.findByTeamAndUser(
-                                teamService.findByGuildId(event.getGuild().getId()),
-                                userService.findBySerialId(event.getUser().getName())
-                        ),
-                        answerContent, nowLocalDateTime);
+
+                answerService.saveAnswer(findQuestion, getMember(event, event.getUser().getName()),answerContent, nowLocalDateTime);
                 questionService.updateQuestionStatus(findQuestion, EQuestionStatus.FINISH);
 
                 event.reply("답변이 등록 되었습니다 ! ").setEphemeral(true).queue();
@@ -113,10 +113,11 @@ public class DiscordListener extends ListenerAdapter {
                         .sendMessage( maker.getAsMention() +  "님! 질문에 답변이 등록 되었어요 ! ")
                         .queue();
                 break;
+
             case "업무시작":
                 // 팀, 사용자 조회 -> 팀 멤버 조회
                 Team team = teamService.saveTeam(event.getGuild().getId(), event.getGuild().getName(), event.getGuild().getIconUrl(), nowLocalDate);
-                goormthon.team28.startup_valley.domain.Member member = memberService.saveMember(team, userService.findBySerialId(event.getUser().getName()));
+                goormthon.team28.startup_valley.domain.Member member = memberService.saveMember(team, me(event));
 
                 // 스크럼 생성 또는 조회
                 Scrum scrum = scrumService.saveScrum(member, nowLocalDate);
@@ -134,6 +135,46 @@ public class DiscordListener extends ListenerAdapter {
                         "오늘의 업무 시작 시간: " + nowLocalDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")))
                         .setEphemeral(true).queue();
                 break;
+
+            case "업무종료":
+                String workList = event.getOption("work_list").getAsString();
+
+                // 현재 내가 진행 중인 작업 조회하기
+                Optional<Work> optionalWork = getMyWork(event);
+                if (optionalWork.isEmpty()){ //  내가 진행 중인 작업이 없는 경우
+                    event.reply("진행 중인 작업이 없습니다 ! 업무 시작을 먼저 진행해주세요 ~ ! ")
+                            .setEphemeral(true).queue();
+                    return;
+                }
+
+                // 현재 진행 중인 작업의 종료 데이터 업데이트 & 조회
+                workService.updateWorkAfterOver(optionalWork.get().getId(), workList, nowLocalDateTime);
+                Work myWork = workService.findById(optionalWork.get().getId());
+
+                // 오늘의 업무 작업 시간 계산
+                long todayWork = Duration.between(myWork.getStartAt(), myWork.getEndAt()).toMinutes();
+                goormthon.team28.startup_valley.domain.Member worker = getMember(event, event.getUser().getName());
+                Long totalTime = Long.valueOf(worker.getTotalMinute() + todayWork);
+
+                // 업무 시간 DB 반영
+                memberService.updateTotalWorkTime(worker.getId(), totalTime);
+
+                List<String> works = Arrays.stream(workList.split("; ")).toList();
+                event.reply("고생하셨습니다 ~ ! \n\n" +
+                        "오늘의 업무는: " + works.toString() + " 입니다 !\n\n" +
+                        "오늘의 업무 종료 시간은: " + nowLocalDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")) + "입니다 !\n\n" +
+                        "오늘의 업무는 " + todayWork/60 + " 시간 " + todayWork%60 + " 분 입니다 !!")
+                        .setEphemeral(true).queue();
+                break;
+
+            case "스크럼종료":
+                Optional<Scrum> nowScrum = getScrum(event, event.getUser().getName());
+                if (nowScrum.isEmpty()){
+                    event.reply("진행 중인 업무가 없어서 스크럼을 종료할 수 없습니다 ㅠㅠ.. 업무를 시작하여 스크럼을 생성해주세요 !!! ")
+                            .setEphemeral(true).queue();
+                    return;
+                }
+                break;
         }
     }
     public List<String> findNoSignUp(List<Member> members) {
@@ -145,6 +186,25 @@ public class DiscordListener extends ListenerAdapter {
             }
         }
         return usersWithoutInfo;
+    }
+    private Team myTeam(SlashCommandInteractionEvent event){
+        return teamService.findByGuildId(event.getGuild().getId());
+    }
+    private goormthon.team28.startup_valley.domain.User me(SlashCommandInteractionEvent event){
+        return userService.findBySerialId(event.getUser().getName());
+    }
+    private goormthon.team28.startup_valley.domain.Member getMember(SlashCommandInteractionEvent event, String userId){
+        return memberService.findByTeamAndUser(
+                myTeam(event),
+                userService.findBySerialId(userId)
+        );
+    }
+    private Optional<Scrum> getScrum(SlashCommandInteractionEvent event, String userId){
+        return scrumService.findNowScrum(getMember(event, userId));
+    }
+    private Optional<Work> getMyWork(SlashCommandInteractionEvent event){
+        String userId = event.getUser().getName();
+        return workService.findNotOverWork(getScrum(event, userId).get(), getMember(event, userId));
     }
 
 }

@@ -11,6 +11,7 @@ import goormthon.team28.startup_valley.dto.type.EScrumStatus;
 import goormthon.team28.startup_valley.exception.CommonException;
 import goormthon.team28.startup_valley.exception.ErrorCode;
 import goormthon.team28.startup_valley.repository.*;
+import goormthon.team28.startup_valley.repository.ScrumRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -80,5 +81,8 @@ public class ScrumService {
         }
 
         return ScrumListDto.of(scrumDtoList);
+    }
+    public Optional<Scrum> findNowScrum(Member member){
+        return scrumRepository.findByWorkerAndStatus(member, EScrumStatus.IN_PROGRESS);
     }
 }
