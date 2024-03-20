@@ -37,15 +37,17 @@ public class ReviewService {
         Member currentMember = memberRepository.findByTeamAndUser(team, currentUser)
                 .orElseThrow(() -> new CommonException(ErrorCode.MISMATCH_LOGIN_USER_AND_TEAM));
 
-        List<Review> reviewList = reviewRepository.findAllByTeam(team);
-        List<PeerReviewDto> peerReviewDtoList = reviewList.stream()
-                .filter(review -> !review.getReceiver().equals(currentMember))
-                .map(review -> PeerReviewDto.of(
-                        review.getSender().getId(),
-                        review.getSender().getUser().getNickname(),
-                        review.getSender().getUser().getProfileImage(),
-                        review.getSender().getPart(),
-                        review.getContent()
+        List<Member> memberList = memberRepository.findAllByTeam(team);
+        List<PeerReviewDto> peerReviewDtoList = memberList.stream()
+                .filter(member -> !member.equals(currentMember))
+                .map(member -> PeerReviewDto.of(
+                        member.getId(),
+                        member.getUser().getNickname(),
+                        member.getUser().getProfileImage(),
+                        member.getPart(),
+                        reviewRepository.findBySender(member)
+                                .map(Review::getContent)
+                                .orElse(null)
                 ))
                 .toList();
 
