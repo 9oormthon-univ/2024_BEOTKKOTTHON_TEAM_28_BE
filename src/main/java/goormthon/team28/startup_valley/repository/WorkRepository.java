@@ -13,4 +13,5 @@ import java.util.Optional;
 public interface WorkRepository extends JpaRepository<Work, Long> {
     Optional<Work> findByScrumAndOwnerAndEndAtIsNull(Scrum scrum,Member owner);
     List<Work> findAllByOwner(Member member);
+    List<Work> findTop3ByScrum(Scrum scrum);
 }
