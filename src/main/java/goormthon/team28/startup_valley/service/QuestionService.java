@@ -81,7 +81,7 @@ public class QuestionService {
         return QuestionListDto.of(questionDtoList, questionDtoList.size());
     }
 
-    public QuestionRetrieveSetListDto listReceivedQuestion(Long userId, Long teamsId) {
+    public QuestionRetrieveSetListDto listReceivedQuestion(Long userId, Long teamsId, Boolean isReceived) {
 
         User currentUser = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
@@ -90,11 +90,10 @@ public class QuestionService {
         Member member = memberRepository.findByTeamAndUser(team, currentUser)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_MEMBER));
 
-        List<Question> receivedQuestionList = questionRepository
-                .findAllByReceiverAndStatus(member, EQuestionStatus.WAITING_ANSWER);
-
+        List<Question> questionList = isReceived ? questionRepository .findAllByReceiver(member)
+                                                 : questionRepository.findAllBySender(member);
         List<QuestionRetrieveSetDto> questionRetrieveSetDtoList = new ArrayList<>();
-        for (Question question : receivedQuestionList) {
+        for (Question question : questionList) {
             Optional<Answer> answer = answerRepository.findByQuestion(question);
             questionRetrieveSetDtoList.add(QuestionRetrieveSetDto.of(
                     QuestionRetrieveDto.of(
