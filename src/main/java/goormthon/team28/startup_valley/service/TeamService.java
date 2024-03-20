@@ -86,7 +86,10 @@ public class TeamService {
         );
     }
 
-    public TeamRetrieveDto retrieveTeam(Long userId, Long teamsId) {
+    public Object listProgressingTeam(Long userId) {
+    }
+
+    public TeamSummaryDto retrieveTeam(Long userId, Long teamsId) {
 
         User currentUser = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
@@ -96,7 +99,7 @@ public class TeamService {
         if (!memberRepository.existsByUserAndTeam(currentUser, team))
             throw new CommonException(ErrorCode.MISMATCH_LOGIN_USER_AND_TEAM);
 
-        return TeamRetrieveDto.of(
+        return TeamSummaryDto.of(
                 team.getId(),
                 team.getName(),
                 team.getTeamImage(),

@@ -7,7 +7,7 @@ import java.io.Serializable;
 import java.time.LocalDate;
 
 @Builder
-public record TeamRetrieveDto(
+public record TeamSummaryDto(
         @JsonProperty("id")
         Long id,
         @JsonProperty("name")
@@ -17,13 +17,13 @@ public record TeamRetrieveDto(
         @JsonProperty("startAt")
         String startAt
 ) implements Serializable {
-    public static TeamRetrieveDto of(
+    public static TeamSummaryDto of(
             final Long id,
             final String name,
             final String profileImage,
             final LocalDate startAt
     ) {
-        return TeamRetrieveDto.builder()
+        return TeamSummaryDto.builder()
                 .id(id)
                 .name(name)
                 .profileImage(profileImage)
