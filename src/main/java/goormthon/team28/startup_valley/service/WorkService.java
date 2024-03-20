@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -148,5 +149,76 @@ public class WorkService {
         work.updateTime(workTimeDto.startAt(), workTimeDto.endAt());
 
         return Boolean.TRUE;
+    }
+
+    public WorkMeasureDto measureTeamMemberWork(Long userId, Long membersId) {
+
+        User currentUser = userRepository.findById(userId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+        Member targetMember = memberRepository.findById(membersId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_MEMBER));
+        Team team = targetMember.getTeam();
+        // 검색하려는 대상과 로그인 한 유저의 팀이 다를 경우
+        if (!memberRepository.existsByUserAndTeam(currentUser, team))
+            throw new CommonException(ErrorCode.MISMATCH_LOGIN_USER_AND_TEAM);
+
+        List<Work> workList = workRepository.findAllByOwner(targetMember);
+        List<WorkDateDto> workDateDtoList = workList.stream()
+                .map(work -> WorkDateDto.of(
+                        work.getStartAt().toLocalDate(),
+                        Duration.between(work.getStartAt(), work.getEndAt()).toMinutes()
+                ))
+                .toList();
+
+        Optional<Long> maxTime = workDateDtoList.stream()
+                .map(WorkDateDto::time)
+                .max(Long::compareTo);
+
+        return WorkMeasureDto.of(
+                targetMember.getUser().getNickname(),
+                targetMember.getTotalMinute(),
+                workDateDtoList.size(),
+                maxTime.orElse(0L),
+                workDateDtoList
+        );
+    }
+
+    public WorkMeasureDto measureAllWork(Long userId, Long membersId) {
+
+        Member targetMember = memberRepository.findById(membersId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_MEMBER));
+        User targetUser = targetMember.getUser();
+        List<Member> memberList = memberRepository.findAllByUser(targetUser).stream()
+                .filter(Member::getIsPublic)
+                .toList();
+
+        List<WorkDateDto> workDateDtoList = new ArrayList<>();
+        for (Member tempMember : memberList) {
+            List<Work> workList = workRepository.findAllByOwner(tempMember);
+            workDateDtoList.addAll(
+                    workList.stream()
+                            .map(work -> WorkDateDto.of(
+                                    work.getStartAt().toLocalDate(),
+                                    Duration.between(work.getStartAt(), work.getEndAt()).toMinutes()
+                            ))
+                            .toList()
+            );
+        }
+
+        Long totalTime = workDateDtoList.stream()
+                .mapToLong(WorkDateDto::time)
+                .sum();
+
+        Optional<Long> maxTime = workDateDtoList.stream()
+                .map(WorkDateDto::time)
+                .max(Long::compareTo);
+
+        return WorkMeasureDto.of(
+                targetUser.getNickname(),
+                totalTime,
+                workDateDtoList.size(),
+                maxTime.orElse(0L),
+                workDateDtoList
+        );
     }
 }
