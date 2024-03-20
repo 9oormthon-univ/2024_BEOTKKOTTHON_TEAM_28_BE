@@ -38,4 +38,9 @@ public class WorkController {
             ) {
         return ResponseDto.ok(workService.patchManageWork(userId, membersId, worksId, workTimeDto));
     }
+
+    @GetMapping("/members/{membersId}/works/measure")
+    public ResponseDto<?> measureTeamMemberWork(@UserId Long userId, @PathVariable Long membersId) {
+        return ResponseDto.ok(workService.measureTeamMemberWork(userId, membersId));
+    }
 }
