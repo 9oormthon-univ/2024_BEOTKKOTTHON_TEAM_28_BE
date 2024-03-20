@@ -3,6 +3,7 @@ package goormthon.team28.startup_valley.service;
 import goormthon.team28.startup_valley.domain.Member;
 import goormthon.team28.startup_valley.domain.Team;
 import goormthon.team28.startup_valley.domain.User;
+import goormthon.team28.startup_valley.dto.request.TeamMemberPermissionPatchDto;
 import goormthon.team28.startup_valley.dto.response.*;
 import goormthon.team28.startup_valley.dto.type.EProjectStatus;
 import goormthon.team28.startup_valley.exception.CommonException;
@@ -124,5 +125,30 @@ public class TeamService {
                 .toList();
 
         return TeamMemberPermissionListDto.of(teamMemberPermissionDtoList);
+    }
+
+    @Transactional
+    public Boolean patchTeamLeader(
+            Long userId,
+            Long teamsId,
+            TeamMemberPermissionPatchDto teamMemberPermissionPatchDto
+    ) {
+        User currentUser = userRepository.findById(userId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+        Team team = teamRepository.findById(teamsId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_TEAM));
+        Member currentMember = memberRepository.findByTeamAndUser(team, currentUser)
+                .orElseThrow(() -> new CommonException(ErrorCode.MISMATCH_LOGIN_USER_AND_TEAM));
+
+        // 팀원은 맞지만, 팀 리더가 아닌 경우
+        if (!team.getLeader().equals(currentMember))
+            throw new CommonException(ErrorCode.MISMATCH_MEMBER_AND_TEAM_LEADER);
+
+        Member targetMember = memberRepository.findById(teamMemberPermissionPatchDto.memberId())
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_MEMBER));
+
+        team.changeTeamLeader(targetMember);
+
+        return Boolean.TRUE;
     }
 }

@@ -15,6 +15,7 @@ public enum ErrorCode {
     MISMATCH_TEAM(40004, HttpStatus.BAD_REQUEST, "질문자와 답변자의 팀이 일치하지 않습니다."),
     MISMATCH_LOGIN_USER_AND_MEMBER(40005, HttpStatus.BAD_REQUEST, "로그인 사용자와 멤버가 일치하지 않습니다."),
     MISMATCH_LOGIN_USER_AND_TEAM(40006, HttpStatus.BAD_REQUEST, "로그인 사용자는 해당 팀원이 아닙니다."),
+    MISMATCH_MEMBER_AND_TEAM_LEADER(40007, HttpStatus.BAD_REQUEST, "해당 팀원은 권한이 없습니다."),
 
     //401
     INVALID_HEADER_VALUE(40100, HttpStatus.UNAUTHORIZED, "올바르지 않은 헤더값입니다."),
