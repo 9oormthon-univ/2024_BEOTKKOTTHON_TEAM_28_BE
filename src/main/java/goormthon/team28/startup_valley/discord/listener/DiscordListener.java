@@ -1,7 +1,9 @@
 package goormthon.team28.startup_valley.discord.listener;
 
 import goormthon.team28.startup_valley.domain.Question;
+import goormthon.team28.startup_valley.domain.Scrum;
 import goormthon.team28.startup_valley.domain.Team;
+import goormthon.team28.startup_valley.domain.Work;
 import goormthon.team28.startup_valley.dto.type.EProjectStatus;
 import goormthon.team28.startup_valley.dto.type.EQuestionStatus;
 import goormthon.team28.startup_valley.repository.MemberRepository;
@@ -20,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,6 +34,8 @@ public class DiscordListener extends ListenerAdapter {
     private final MemberService memberService;
     private final QuestionService questionService;
     private final AnswerService answerService;
+    private final ScrumService scrumService;
+    private final WorkService workService;
     @Override
     @Transactional
     public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
@@ -93,6 +98,7 @@ public class DiscordListener extends ListenerAdapter {
                 String answerContent = event.getOption("answer_content").getAsString();
 
                 Question findQuestion = questionService.findByCode(code);
+                // member 추가하기 builder
                 answerService.saveAnswer(findQuestion, answerContent, nowLocalDateTime);
                 questionService.updateQuestionStatus(findQuestion, EQuestionStatus.FINISH);
 
@@ -101,8 +107,27 @@ public class DiscordListener extends ListenerAdapter {
                 event.getGuild().getTextChannelById(event.getChannel().getId())
                         .sendMessage( maker.getAsMention() +  "님! 질문에 답변이 등록 되었어요 ! ")
                         .queue();
+                break;
+            case "업무시작":
+                // 팀, 사용자 조회 -> 팀 멤버 조회
+                Team team = teamService.saveTeam(event.getGuild().getId(), event.getGuild().getName(), event.getGuild().getIconUrl(), nowLocalDate);
+                goormthon.team28.startup_valley.domain.Member member = memberService.saveMember(team, userService.findBySerialId(event.getUser().getName()));
 
+                // 스크럼 생성 또는 조회
+                Scrum scrum = scrumService.saveScrum(member, nowLocalDate);
 
+                if (!workService.findNotOverWork(scrum, member).isEmpty()){
+                    event.reply("이전의 업무가 존재합니다 ㅠㅠ, 기존 업무를 종료하고 새로운 작업을 시작해주세요 ! ")
+                            .setEphemeral(true).queue();
+                    return;
+                }
+
+                // 업무 생성
+                Work work = workService.saveWork(scrum, member, nowLocalDateTime);
+
+                event.reply(event.getMember().getAsMention() + "의 오늘의 업무가 등록 되었습니다 ! \n\n" +
+                        "오늘의 업무 시작 시간: " + nowLocalDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")))
+                        .setEphemeral(true).queue();
                 break;
         }
     }
