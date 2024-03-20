@@ -35,5 +35,6 @@ public class Member {
     public Member(Team team, User user) {
         this.team = team;
         this.user = user;
+        this.totalMinute = 0L;
     }
 }
