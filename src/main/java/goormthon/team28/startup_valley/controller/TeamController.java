@@ -19,6 +19,11 @@ public class TeamController {
         return ResponseDto.ok(teamService.getTeamList(userId));
     }
 
+    @GetMapping("/teams/retrieve-list")
+    public ResponseDto<?> listProgressingTeam(@UserId Long userId) {
+        return ResponseDto.ok(teamService.listProgressingTeam(userId));
+    }
+
     @GetMapping("/teams/{teamsId}")
     public ResponseDto<?> retrieveTeam(@UserId Long userId, @PathVariable Long teamsId) {
         return ResponseDto.ok(teamService.retrieveTeam(userId, teamsId));

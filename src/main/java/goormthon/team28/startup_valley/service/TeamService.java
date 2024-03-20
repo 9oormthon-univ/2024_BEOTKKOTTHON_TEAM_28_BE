@@ -86,7 +86,24 @@ public class TeamService {
         );
     }
 
-    public Object listProgressingTeam(Long userId) {
+    public TeamRetrieveListDto listProgressingTeam(Long userId) {
+
+        User currentUser = userRepository.findById(userId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+        List<Member> memberList = memberRepository.findAllByUser(currentUser);
+        List<TeamRetrieveDto> teamRetrieveDtoList = memberList.stream()
+                .map(member -> TeamRetrieveDto.of(
+                        member.getTeam().getId(),
+                        member.getTeam().getName(),
+                        member.getRetrospection(),
+                        member.getTeam().getTeamImage(),
+                        member.getTeam().getStartAt(),
+                        member.getTeam().getEndAt(),
+                        member.getTeam().getStatus()
+                ))
+                .toList();
+
+        return TeamRetrieveListDto.of(teamRetrieveDtoList);
     }
 
     public TeamSummaryDto retrieveTeam(Long userId, Long teamsId) {
