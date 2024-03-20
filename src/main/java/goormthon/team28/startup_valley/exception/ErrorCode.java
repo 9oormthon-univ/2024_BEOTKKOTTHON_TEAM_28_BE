@@ -18,6 +18,9 @@ public enum ErrorCode {
     MISMATCH_MEMBER_AND_TEAM_LEADER(40007, HttpStatus.BAD_REQUEST, "해당 팀원은 권한이 없습니다."),
     INVALID_USER_PROFILE_IMAGE_ENUM(40008, HttpStatus.BAD_REQUEST, "유효하지 않는 사용자 프로필 사진입니다."),
     INVALID_CHECK_TEAM_CONTRIBUTION(40009, HttpStatus.BAD_REQUEST, "멤버의 프로젝트 기여도가 비공개 상태입니다."),
+    INVALID_CREATE_PEER_REVIEW_OTHER(40010, HttpStatus.BAD_REQUEST, "해당 사용자(멤버)는 이미 리뷰를 작성하였습니다."),
+    INVALID_CREATE_PEER_REVIEW_SELF(40010, HttpStatus.BAD_REQUEST, "자신에게 리뷰를 작성할 수 없습니다."),
+    INVALID_CREATE_PEER_REVIEW_TO_OTHER_TEAM_MEMBER(40011, HttpStatus.BAD_REQUEST, "다른 팀의 멤버에게 리뷰를 작성할 수 없습니다."),
 
     //401
     INVALID_HEADER_VALUE(40100, HttpStatus.UNAUTHORIZED, "올바르지 않은 헤더값입니다."),
