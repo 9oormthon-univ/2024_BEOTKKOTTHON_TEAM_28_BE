@@ -9,14 +9,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
-    public User findBySerialId(String serialId){
-        return userRepository.findBySerialId(serialId)
-                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+    public Optional<User> findBySerialId(String serialId){
+        return userRepository.findBySerialId(serialId);
     }
     public boolean isExisted(String serialId){
         return userRepository.existsBySerialId(serialId);
