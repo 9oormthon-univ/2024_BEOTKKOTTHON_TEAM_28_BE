@@ -49,6 +49,10 @@ public class TeamService {
     public void updateLeader(Long teamId, Member member){
         teamRepository.updateLeader(teamId, member);
     }
+    @Transactional
+    public void updateStatus(Long teamId){
+        teamRepository.updateStatus(teamId, EProjectStatus.PEER_REVIEW);
+    }
 
     public TeamListDto getTeamList(Long userId) {
 
