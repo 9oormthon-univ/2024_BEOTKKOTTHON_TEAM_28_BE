@@ -1,10 +1,7 @@
 package goormthon.team28.startup_valley.service;
 
 import goormthon.team28.startup_valley.domain.*;
-import goormthon.team28.startup_valley.dto.response.RankingDto;
-import goormthon.team28.startup_valley.dto.response.RankingListDto;
-import goormthon.team28.startup_valley.dto.response.WorkDto;
-import goormthon.team28.startup_valley.dto.response.WorkListDto;
+import goormthon.team28.startup_valley.dto.response.*;
 import goormthon.team28.startup_valley.exception.CommonException;
 import goormthon.team28.startup_valley.exception.ErrorCode;
 import goormthon.team28.startup_valley.repository.*;
@@ -93,7 +90,6 @@ public class WorkService {
         if (!memberRepository.existsByUserAndTeam(currentUser, team))
             throw new CommonException(ErrorCode.NOT_FOUND_MEMBER);
 
-        // 오름차순 정렬해야 되는데 쿼리에서 하는 게 좋지 않을까?
         List<Member> memberList = memberRepository.findAllByTeamOrderByTotalMinuteDesc(team);
         List<RankingDto> rankingDtoList = memberList.stream()
                 .map(member -> RankingDto.of(
@@ -105,5 +101,31 @@ public class WorkService {
                 .toList();
 
         return RankingListDto.of(rankingDtoList, team.getName());
+    }
+
+    public WorkManageListDto listManageWork(Long userId, Long memberId) {
+
+        User currentUser = userRepository.findById(userId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+        Member targetMember = memberRepository.findById(memberId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_MEMBER));
+        Team team = targetMember.getTeam();
+        // 검색하려는 대상과 로그인 한 유저의 팀이 다를 경우
+        Member currentMember = memberRepository.findByTeamAndUser(team, currentUser)
+                .orElseThrow(() -> new CommonException(ErrorCode.MISMATCH_LOGIN_USER_AND_TEAM));
+        if (!team.getLeader().equals(currentMember))
+            throw new CommonException(ErrorCode.MISMATCH_MEMBER_AND_TEAM_LEADER);
+
+        List<Work> workList = workRepository.findAllByOwner(targetMember);
+        List<WorkManageDto> workManageDtoList = workList.stream()
+                .map(work -> WorkManageDto.of(
+                        work.getId(),
+                        work.getContent(),
+                        work.getStartAt(),
+                        work.getEndAt()
+                ))
+                .toList();
+
+        return WorkManageListDto.of(workManageDtoList);
     }
 }

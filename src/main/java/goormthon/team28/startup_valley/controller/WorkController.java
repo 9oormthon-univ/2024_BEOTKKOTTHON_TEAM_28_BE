@@ -25,4 +25,9 @@ public class WorkController {
     public ResponseDto<?> getRanking(@UserId Long userId, @PathVariable Long teamsId) {
         return ResponseDto.ok(workService.getRanking(userId, teamsId));
     }
+
+    @GetMapping("/member/{memberId}/works")
+    public ResponseDto<?> listManageWork(@UserId Long userId, @PathVariable Long memberId) {
+        return ResponseDto.ok(workService.listManageWork(userId, memberId));
+    }
 }
