@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -41,9 +42,8 @@ public class TeamService {
                                 .build())
                 );
     }
-    public Team findByGuildId(String guildId) {
-        return teamRepository.findByGuildId(guildId)
-                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_TEAM));
+    public Optional<Team> findByGuildId(String guildId) {
+        return teamRepository.findByGuildId(guildId);
     }
     @Transactional
     public void updateLeader(Long teamId, Member member){
@@ -86,7 +86,27 @@ public class TeamService {
         );
     }
 
-    public TeamRetrieveDto retrieveTeam(Long userId, Long teamsId) {
+    public TeamRetrieveListDto listProgressingTeam(Long userId) {
+
+        User currentUser = userRepository.findById(userId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+        List<Member> memberList = memberRepository.findAllByUser(currentUser);
+        List<TeamRetrieveDto> teamRetrieveDtoList = memberList.stream()
+                .map(member -> TeamRetrieveDto.of(
+                        member.getTeam().getId(),
+                        member.getTeam().getName(),
+                        member.getRetrospection(),
+                        member.getTeam().getTeamImage(),
+                        member.getTeam().getStartAt(),
+                        member.getTeam().getEndAt(),
+                        member.getTeam().getStatus()
+                ))
+                .toList();
+
+        return TeamRetrieveListDto.of(teamRetrieveDtoList);
+    }
+
+    public TeamSummaryDto retrieveTeam(Long userId, Long teamsId) {
 
         User currentUser = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
@@ -96,7 +116,7 @@ public class TeamService {
         if (!memberRepository.existsByUserAndTeam(currentUser, team))
             throw new CommonException(ErrorCode.MISMATCH_LOGIN_USER_AND_TEAM);
 
-        return TeamRetrieveDto.of(
+        return TeamSummaryDto.of(
                 team.getId(),
                 team.getName(),
                 team.getTeamImage(),

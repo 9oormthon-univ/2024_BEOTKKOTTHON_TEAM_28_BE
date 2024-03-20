@@ -38,10 +38,10 @@ public class QuestionService {
         while(questionRepository.existsByCode(code)){
             code = NumberUtil.generateRandomCode();
         }
-        Team findTeam = teamService.findByGuildId(guildId);
+        Team findTeam = teamService.findByGuildId(guildId).get();
         return questionRepository.save(Question.builder()
-                        .sender(memberService.findByTeamAndUser(findTeam, userService.findBySerialId(senderId)))
-                        .receiver(memberService.findByTeamAndUser(findTeam, userService.findBySerialId(receiverId)))
+                        .sender(memberService.findByTeamAndUser(findTeam, userService.findBySerialId(senderId).get()))
+                        .receiver(memberService.findByTeamAndUser(findTeam, userService.findBySerialId(receiverId).get()))
                         .content(content)
                         .status(EQuestionStatus.WAITING_ANSWER)
                         .createdAt(time)
