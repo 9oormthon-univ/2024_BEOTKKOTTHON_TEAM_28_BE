@@ -2,12 +2,10 @@ package goormthon.team28.startup_valley.controller;
 
 import goormthon.team28.startup_valley.annotation.UserId;
 import goormthon.team28.startup_valley.dto.global.ResponseDto;
+import goormthon.team28.startup_valley.dto.request.WorkTimeDto;
 import goormthon.team28.startup_valley.service.WorkService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -26,8 +24,18 @@ public class WorkController {
         return ResponseDto.ok(workService.getRanking(userId, teamsId));
     }
 
-    @GetMapping("/member/{memberId}/works")
-    public ResponseDto<?> listManageWork(@UserId Long userId, @PathVariable Long memberId) {
-        return ResponseDto.ok(workService.listManageWork(userId, memberId));
+    @GetMapping("/member/{membersId}/works")
+    public ResponseDto<?> listManageWork(@UserId Long userId, @PathVariable Long membersId) {
+        return ResponseDto.ok(workService.listManageWork(userId, membersId));
+    }
+
+    @PatchMapping("/member/{membersId}/works/{worksId}")
+    public ResponseDto<?> patchManageWork(
+            @UserId Long userId,
+            @PathVariable Long membersId,
+            @PathVariable Long worksId,
+            @RequestBody WorkTimeDto workTimeDto
+            ) {
+        return ResponseDto.ok(workService.patchManageWork(userId, membersId, worksId, workTimeDto));
     }
 }

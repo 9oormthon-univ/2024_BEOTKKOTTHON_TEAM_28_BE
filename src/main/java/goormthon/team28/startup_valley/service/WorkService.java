@@ -1,6 +1,7 @@
 package goormthon.team28.startup_valley.service;
 
 import goormthon.team28.startup_valley.domain.*;
+import goormthon.team28.startup_valley.dto.request.WorkTimeDto;
 import goormthon.team28.startup_valley.dto.response.*;
 import goormthon.team28.startup_valley.exception.CommonException;
 import goormthon.team28.startup_valley.exception.ErrorCode;
@@ -103,11 +104,11 @@ public class WorkService {
         return RankingListDto.of(rankingDtoList, team.getName());
     }
 
-    public WorkManageListDto listManageWork(Long userId, Long memberId) {
+    public WorkManageListDto listManageWork(Long userId, Long membersId) {
 
         User currentUser = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
-        Member targetMember = memberRepository.findById(memberId)
+        Member targetMember = memberRepository.findById(membersId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_MEMBER));
         Team team = targetMember.getTeam();
         // 검색하려는 대상과 로그인 한 유저의 팀이 다를 경우
@@ -127,5 +128,25 @@ public class WorkService {
                 .toList();
 
         return WorkManageListDto.of(workManageDtoList);
+    }
+
+    public Boolean patchManageWork(Long userId, Long membersId, Long worksId, WorkTimeDto workTimeDto) {
+
+        User currentUser = userRepository.findById(userId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+        Member targetMember = memberRepository.findById(membersId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_MEMBER));
+        Team team = targetMember.getTeam();
+        // 검색하려는 대상과 로그인 한 유저의 팀이 다를 경우
+        Member currentMember = memberRepository.findByTeamAndUser(team, currentUser)
+                .orElseThrow(() -> new CommonException(ErrorCode.MISMATCH_LOGIN_USER_AND_TEAM));
+        if (!team.getLeader().equals(currentMember))
+            throw new CommonException(ErrorCode.MISMATCH_MEMBER_AND_TEAM_LEADER);
+
+        Work work = workRepository.findByIdAndOwner(worksId, targetMember)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_WORK));
+        work.updateTime(workTimeDto.startAt(), workTimeDto.endAt());
+
+        return Boolean.TRUE;
     }
 }
