@@ -16,7 +16,7 @@ import java.util.Optional;
 public interface WorkRepository extends JpaRepository<Work, Long> {
     Optional<Work> findByScrumAndOwnerAndEndAtIsNull(Scrum scrum,Member owner);
     List<Work> findAllByOwner(Member member);
-
+    List<Work> findTop3ByScrum(Scrum scrum);
     @Modifying(clearAutomatically = true)
     @Query("update Work w set w.content = :content, w.endAt = :now where w.id = :workId")
     void updateWorkAfterOver(Long workId, String content, LocalDateTime now);

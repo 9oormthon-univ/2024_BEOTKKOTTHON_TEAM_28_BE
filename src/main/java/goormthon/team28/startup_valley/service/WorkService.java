@@ -57,7 +57,7 @@ public class WorkService {
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_TEAM));
 
         // 해당 팀의 멤버가 아닐 수도 있는 경우 체크
-        if (memberRepository.existsByUserAndTeam(currentUser, team))
+        if (!memberRepository.existsByUserAndTeam(currentUser, team))
             throw new CommonException(ErrorCode.NOT_FOUND_MEMBER);
 
         List<Member> memberList = memberRepository.findAllByTeam(team);
@@ -87,7 +87,7 @@ public class WorkService {
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_TEAM));
 
         // 해당 팀의 멤버가 아닐 수도 있는 경우 체크
-        if (memberRepository.existsByUserAndTeam(currentUser, team))
+        if (!memberRepository.existsByUserAndTeam(currentUser, team))
             throw new CommonException(ErrorCode.NOT_FOUND_MEMBER);
 
         // 오름차순 정렬해야 되는데 쿼리에서 하는 게 좋지 않을까?

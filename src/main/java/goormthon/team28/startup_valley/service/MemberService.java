@@ -31,7 +31,7 @@ public class MemberService {
         User currentUser = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 
-        if (memberRepository.existsByUser(currentUser))
+        if (!memberRepository.existsByUser(currentUser))
             throw new CommonException(ErrorCode.NOT_FOUND_MEMBER);
 
         Team team = teamRepository.findById(teamsId)
