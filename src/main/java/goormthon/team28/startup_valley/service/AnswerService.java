@@ -51,9 +51,10 @@ public class AnswerService {
     }
 
     @Transactional
-    public Answer saveAnswer(Question question, String content, LocalDateTime now){
+    public Answer saveAnswer(Question question, Member member, String content, LocalDateTime now){
         return answerRepository.save(Answer.builder()
                         .question(question)
+                        .member(member)
                         .content(content)
                         .createdAt(now)
                 .build()
