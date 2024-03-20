@@ -31,6 +31,8 @@ public class Member {
     private Long totalMinute;
     @Column(name = "retrospection")
     private String retrospection;
+    @Column(name = "peer_review_summary")
+    private String peerReviewSummary;
     @Column(name = "is_public", nullable = false)
     private Boolean isPublic;
     @Builder
@@ -39,5 +41,9 @@ public class Member {
         this.user = user;
         this.totalMinute = 0L;
         this.isPublic = Boolean.TRUE;
+    }
+
+    public void toggleIsPublic() {
+        this.isPublic = this.isPublic ? Boolean.FALSE : Boolean.TRUE;
     }
 }

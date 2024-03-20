@@ -52,4 +52,9 @@ public class User {
     public void updateRefreshToken(String refreshToken) {
         this.refreshToken = refreshToken;
     }
+
+    public void updateUserInfo(String nickname, EProfileImage eProfileImage) {
+        this.nickname = nickname;
+        this.profileImage = eProfileImage;
+    }
 }
