@@ -2,6 +2,7 @@ package goormthon.team28.startup_valley.domain;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicUpdate;
@@ -27,4 +28,12 @@ public class Review {
     private Member receiver;
     @Column(name = "content")
     private String content;
+
+    @Builder
+    public Review(Team team, Member sender, Member receiver, String content) {
+        this.team = team;
+        this.sender = sender;
+        this.receiver = receiver;
+        this.content = content;
+    }
 }
