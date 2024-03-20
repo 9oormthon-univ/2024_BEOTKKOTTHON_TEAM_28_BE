@@ -225,6 +225,18 @@ public class DiscordListener extends ListenerAdapter {
                         .queue();
 
                 break;
+
+            case "서버최신화":
+                String newName = event.getGuild().getName();
+                String newImage = event.getGuild().getIconUrl();
+                Team myTeam = myTeam(event);
+                if (newName.equals(myTeam.getName()) && newImage.equals(myTeam.getTeamImage())){
+                    event.reply("이름과 이미지가 모두 동일합니다 ㅠㅠ").setEphemeral(true).queue();
+                    return;
+                }
+                teamService.updateInformation(myTeam.getId(), newName, newImage);
+                event.reply("서버의 정보가 변경되었습니다 ! 웹으로 확인해주세요 ~").setEphemeral(true).queue();
+                break;
         }
     }
     public List<String> findNoSignUp(List<Member> members) {
