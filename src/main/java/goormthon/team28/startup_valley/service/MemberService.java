@@ -62,4 +62,8 @@ public class MemberService {
         return memberRepository.findByTeamAndUser(team, user)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_MEMBER));
     }
+    @Transactional
+    public void updateTotalWorkTime(Long memberId, Long totalTime){
+        memberRepository.updateTotalMinute(memberId, totalTime);
+    }
 }

@@ -52,7 +52,9 @@ public class StartupValleyApplication {
 						.addOption(OptionType.STRING, "code", "답변할 질문에 대한 코드를 입력하세요", true)
 						.addOption(OptionType.USER, "receiver", "답변을 받는 사람을 선택해주세요 ! ", true)
 						.addOption(OptionType.STRING, "answer_content", "답변 내용을 작성해주세요 !", true),
-				Commands.slash("업무시작", "오늘의 업무 시간을 시작해요 !")
+				Commands.slash("업무시작", "오늘의 업무 시간을 시작해요 !"),
+				Commands.slash("업무종료", "오늘의 업무를 종료해요 ! 업무 내용과 함께 기입해주세요 ~ !")
+						.addOption(OptionType.STRING, "work_list", "오늘의 업무 내용을 '; '을 통해서 구분하여 작성해주세요 !! ", true)
 		).queue();
 	}
 

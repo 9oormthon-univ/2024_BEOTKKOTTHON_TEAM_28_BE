@@ -39,6 +39,7 @@ public enum ErrorCode {
     NOT_FOUND_MEMBER(40403, HttpStatus.NOT_FOUND, "존재하지 않는 멤버입니다."),
     NOT_FOUND_QUESTION(40404, HttpStatus.NOT_FOUND, "존재하지 않는 질문입니다."),
     NOT_FOUND_SCRUM(40405, HttpStatus.NOT_FOUND, "존재하지 않는 스크럼입니다."),
+    NOT_FOUND_WORK(40406, HttpStatus.NOT_FOUND, "존재하지 않는 작업입니다."),
 
 
     //500

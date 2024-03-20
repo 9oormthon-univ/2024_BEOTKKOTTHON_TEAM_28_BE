@@ -3,8 +3,6 @@ package goormthon.team28.startup_valley.service;
 import goormthon.team28.startup_valley.domain.Member;
 import goormthon.team28.startup_valley.domain.Scrum;
 import goormthon.team28.startup_valley.dto.type.EScrumStatus;
-import goormthon.team28.startup_valley.exception.CommonException;
-import goormthon.team28.startup_valley.exception.ErrorCode;
 import goormthon.team28.startup_valley.repository.ScrumRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,5 +25,8 @@ public class ScrumService {
                                 .startAt(now)
                         .build())
                 );
+    }
+    public Optional<Scrum> findNowScrum(Member member){
+        return scrumRepository.findByWorkerAndStatus(member, EScrumStatus.IN_PROGRESS);
     }
 }
