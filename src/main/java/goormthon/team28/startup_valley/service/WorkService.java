@@ -1,9 +1,6 @@
 package goormthon.team28.startup_valley.service;
 
-import goormthon.team28.startup_valley.domain.Member;
-import goormthon.team28.startup_valley.domain.Team;
-import goormthon.team28.startup_valley.domain.User;
-import goormthon.team28.startup_valley.domain.Work;
+import goormthon.team28.startup_valley.domain.*;
 import goormthon.team28.startup_valley.dto.response.RankingDto;
 import goormthon.team28.startup_valley.dto.response.RankingListDto;
 import goormthon.team28.startup_valley.dto.response.WorkDto;
@@ -14,9 +11,12 @@ import goormthon.team28.startup_valley.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -27,6 +27,18 @@ public class WorkService {
     private final MemberRepository memberRepository;
     private final TeamRepository teamRepository;
     private final WorkRepository workRepository;
+    @Transactional
+    public Work saveWork(Scrum scrum, Member member, LocalDateTime now){
+        return workRepository.save(Work.builder()
+                        .scrum(scrum)
+                        .owner(member)
+                        .startAt(now)
+                .build()
+        );
+    }
+    public Optional<Work> findNotOverWork(Scrum scrum, Member member){
+        return workRepository.findByScrumAndOwnerAndEndAtIsNull(scrum, member);
+    }
 
     public WorkListDto listMemberWork(Long userId, Long teamsId) {
 

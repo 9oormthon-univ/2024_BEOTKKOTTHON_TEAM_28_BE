@@ -2,6 +2,7 @@ package goormthon.team28.startup_valley.domain;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicUpdate;
@@ -19,16 +20,21 @@ public class Work {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "scrum_id")
+    @JoinColumn(name = "scrum_id", nullable = false)
     private Scrum scrum;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
+    @JoinColumn(name = "member_id", nullable = false)
     private Member owner;
-    @Column(name = "content", nullable = false)
+    @Column(name = "content")
     private String content;
     @Column(name = "start_at", nullable = false)
     private LocalDateTime startAt;
     @Column(name = "end_at")
     private LocalDateTime endAt;
-
+    @Builder
+    public Work(Scrum scrum, Member owner, LocalDateTime startAt) {
+        this.scrum = scrum;
+        this.owner = owner;
+        this.startAt = startAt;
+    }
 }

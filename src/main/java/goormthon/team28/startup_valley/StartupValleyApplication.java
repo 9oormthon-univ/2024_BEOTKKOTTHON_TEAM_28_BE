@@ -36,7 +36,9 @@ public class StartupValleyApplication {
 						context.getBean(TeamService.class),
 						context.getBean(MemberService.class),
 						context.getBean(QuestionService.class),
-						context.getBean(AnswerService.class)
+						context.getBean(AnswerService.class),
+						context.getBean(ScrumService.class),
+						context.getBean(WorkService.class)
 						)
 				)
 				.build();
@@ -49,7 +51,8 @@ public class StartupValleyApplication {
 				Commands.slash("답변하기", "답변을 통해 팀원을 도와줘요 ! ")
 						.addOption(OptionType.STRING, "code", "답변할 질문에 대한 코드를 입력하세요", true)
 						.addOption(OptionType.USER, "receiver", "답변을 받는 사람을 선택해주세요 ! ", true)
-						.addOption(OptionType.STRING, "answer_content", "답변 내용을 작성해주세요 !", true)
+						.addOption(OptionType.STRING, "answer_content", "답변 내용을 작성해주세요 !", true),
+				Commands.slash("업무시작", "오늘의 업무 시간을 시작해요 !")
 		).queue();
 	}
 
