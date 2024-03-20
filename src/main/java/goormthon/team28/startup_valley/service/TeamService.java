@@ -53,6 +53,10 @@ public class TeamService {
     public void updateStatus(Long teamId){
         teamRepository.updateStatus(teamId, EProjectStatus.PEER_REVIEW);
     }
+    @Transactional
+    public void updateInformation(Long teamId, String newName, String newImage){
+        teamRepository.updateInformation(teamId, newName, newImage);
+    }
 
     public TeamListDto getTeamList(Long userId) {
 
