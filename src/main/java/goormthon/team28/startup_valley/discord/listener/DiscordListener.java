@@ -3,19 +3,18 @@ package goormthon.team28.startup_valley.discord.listener;
 import goormthon.team28.startup_valley.domain.Question;
 import goormthon.team28.startup_valley.domain.Team;
 import goormthon.team28.startup_valley.dto.type.EProjectStatus;
+import goormthon.team28.startup_valley.dto.type.EQuestionStatus;
 import goormthon.team28.startup_valley.repository.MemberRepository;
 import goormthon.team28.startup_valley.repository.TeamRepository;
 import goormthon.team28.startup_valley.repository.UserRepository;
-import goormthon.team28.startup_valley.service.MemberService;
-import goormthon.team28.startup_valley.service.QuestionService;
-import goormthon.team28.startup_valley.service.TeamService;
-import goormthon.team28.startup_valley.service.UserService;
+import goormthon.team28.startup_valley.service.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import org.hibernate.Hibernate;
 import org.springframework.transaction.annotation.Transactional;
 
 
@@ -31,6 +30,7 @@ public class DiscordListener extends ListenerAdapter {
     private final TeamService teamService;
     private final MemberService memberService;
     private final QuestionService questionService;
+    private final AnswerService answerService;
     @Override
     @Transactional
     public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
@@ -81,8 +81,27 @@ public class DiscordListener extends ListenerAdapter {
                 // 질문 생성 완료, 답변자 및 팀원에게 알리는 내용
                 event.getGuild().getTextChannelById(event.getChannel().getId())
                         .sendMessage(receiver.getAsMention() + "님! 답변을 기다리는 질문이 생성되었어요 ! \n\n" +
-                                "디스코드를 통해 답변하는 경우에는 이 코드를 사용해주세요 ! code: "+ question.getCode())
+                                "디스코드를 통해 답변하는 경우에는 이 코드를 사용해주세요 ! code: "+ question.getCode() + "\n\n" +
+                                "질문한 사람: " + event.getMember().getAsMention() + "\n\n" +
+                                "질문 내용: " + questionContent)
                         .queue();
+
+                break;
+            case "답변하기":
+                String code = event.getOption("code").getAsString();
+                Member maker = event.getOption("receiver").getAsMember();
+                String answerContent = event.getOption("answer_content").getAsString();
+
+                Question findQuestion = questionService.findByCode(code);
+                answerService.saveAnswer(findQuestion, answerContent, nowLocalDateTime);
+                questionService.updateQuestionStatus(findQuestion, EQuestionStatus.FINISH);
+
+                event.reply("답변이 등록 되었습니다 ! ").setEphemeral(true).queue();
+
+                event.getGuild().getTextChannelById(event.getChannel().getId())
+                        .sendMessage( maker.getAsMention() +  "님! 질문에 답변이 등록 되었어요 ! ")
+                        .queue();
+
 
                 break;
         }

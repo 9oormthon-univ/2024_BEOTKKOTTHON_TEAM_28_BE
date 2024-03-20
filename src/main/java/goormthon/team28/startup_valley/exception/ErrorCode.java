@@ -36,6 +36,7 @@ public enum ErrorCode {
     NOT_FOUND_LOGIN_USER(40401, HttpStatus.NOT_FOUND, "로그인한 사용자를 찾을 수 없습니다"),
     NOT_FOUND_TEAM(40402, HttpStatus.NOT_FOUND, "존재하지 않는 팀입니다."),
     NOT_FOUND_MEMBER(40403, HttpStatus.NOT_FOUND, "존재하지 않는 멤버입니다."),
+    NOT_FOUND_QUESTION(40404, HttpStatus.NOT_FOUND, "존재하지 않는 질문입니다."),
 
 
     //500
