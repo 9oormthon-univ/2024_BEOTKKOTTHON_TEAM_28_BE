@@ -99,7 +99,12 @@ public class DiscordListener extends ListenerAdapter {
 
                 Question findQuestion = questionService.findByCode(code);
                 // member 추가하기 builder
-                answerService.saveAnswer(findQuestion, answerContent, nowLocalDateTime);
+                answerService.saveAnswer(findQuestion,
+                        memberService.findByTeamAndUser(
+                                teamService.findByGuildId(event.getGuild().getId()),
+                                userService.findBySerialId(event.getUser().getName())
+                        ),
+                        answerContent, nowLocalDateTime);
                 questionService.updateQuestionStatus(findQuestion, EQuestionStatus.FINISH);
 
                 event.reply("답변이 등록 되었습니다 ! ").setEphemeral(true).queue();
