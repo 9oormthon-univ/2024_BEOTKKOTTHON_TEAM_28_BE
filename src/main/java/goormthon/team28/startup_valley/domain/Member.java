@@ -31,6 +31,8 @@ public class Member {
     private Long totalMinute;
     @Column(name = "retrospection")
     private String retrospection;
+    @Column(name = "peer_review_summary")
+    private String peerReviewSummary;
     @Column(name = "is_public", nullable = false)
     private Boolean isPublic;
     @Builder

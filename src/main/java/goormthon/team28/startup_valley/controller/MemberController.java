@@ -22,4 +22,9 @@ public class MemberController {
     public ResponseDto<?> toggleTeamPublic(@UserId Long userId, @PathVariable Long membersId) {
         return ResponseDto.ok(memberService.toggleTeamPublic(userId, membersId));
     }
+
+    @GetMapping("/members/{membersId}/contribution")
+    public ResponseDto<?> retrieveContributionMember(@UserId Long userId, @PathVariable Long membersId) {
+        return ResponseDto.ok(memberService.retrieveContributionMember(userId, membersId));
+    }
 }
