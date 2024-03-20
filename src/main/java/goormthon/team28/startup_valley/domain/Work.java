@@ -37,4 +37,9 @@ public class Work {
         this.owner = owner;
         this.startAt = startAt;
     }
+
+    public void updateTime(LocalDateTime startAt, LocalDateTime endAt) {
+        this.startAt = startAt;
+        this.endAt = endAt;
+    }
 }
