@@ -1,14 +1,11 @@
 package goormthon.team28.startup_valley.discord.listener;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import goormthon.team28.startup_valley.domain.Question;
 import goormthon.team28.startup_valley.domain.Scrum;
 import goormthon.team28.startup_valley.domain.Team;
 import goormthon.team28.startup_valley.domain.Work;
-import goormthon.team28.startup_valley.dto.type.EProjectStatus;
 import goormthon.team28.startup_valley.dto.type.EQuestionStatus;
-import goormthon.team28.startup_valley.repository.MemberRepository;
-import goormthon.team28.startup_valley.repository.TeamRepository;
-import goormthon.team28.startup_valley.repository.UserRepository;
 import goormthon.team28.startup_valley.service.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,7 +13,6 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import org.hibernate.Hibernate;
 import org.springframework.transaction.annotation.Transactional;
 
 
@@ -39,6 +35,7 @@ public class DiscordListener extends ListenerAdapter {
     private final AnswerService answerService;
     private final ScrumService scrumService;
     private final WorkService workService;
+    private final GptService gptService;
     @Override
     @Transactional
     public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
@@ -62,7 +59,7 @@ public class DiscordListener extends ListenerAdapter {
                             discordMember -> {
                                 goormthon.team28.startup_valley.domain.Member teamMember = memberService.saveMember(
                                         team,
-                                        userService.findBySerialId(discordMember.getUser().getName())
+                                        getUser(event, discordMember.getUser().getName())
                                 );
                                 if (teamMember.getUser().getSerialId().equals(event.getGuild().getOwner().getUser().getName())){
                                     teamService.updateLeader(team.getId(), teamMember);
@@ -110,7 +107,8 @@ public class DiscordListener extends ListenerAdapter {
                 event.reply("답변이 등록 되었습니다 ! ").setEphemeral(true).queue();
 
                 event.getGuild().getTextChannelById(event.getChannel().getId())
-                        .sendMessage( maker.getAsMention() +  "님! 질문에 답변이 등록 되었어요 ! ")
+                        .sendMessage( maker.getAsMention() +  "님! 질문에 답변이 등록 되었어요 ! \n\n" +
+                                "답변 내용: " + answerContent)
                         .queue();
                 break;
 
@@ -140,7 +138,7 @@ public class DiscordListener extends ListenerAdapter {
                 String workList = event.getOption("work_list").getAsString();
 
                 // 현재 내가 진행 중인 작업 조회하기
-                Optional<Work> optionalWork = getMyWork(event);
+                Optional<Work> optionalWork = getMyProcessingWork(event);
                 if (optionalWork.isEmpty()){ //  내가 진행 중인 작업이 없는 경우
                     event.reply("진행 중인 작업이 없습니다 ! 업무 시작을 먼저 진행해주세요 ~ ! ")
                             .setEphemeral(true).queue();
@@ -168,12 +166,42 @@ public class DiscordListener extends ListenerAdapter {
                 break;
 
             case "스크럼종료":
-                Optional<Scrum> nowScrum = getScrum(event, event.getUser().getName());
-                if (nowScrum.isEmpty()){
-                    event.reply("진행 중인 업무가 없어서 스크럼을 종료할 수 없습니다 ㅠㅠ.. 업무를 시작하여 스크럼을 생성해주세요 !!! ")
+                Optional<Scrum> optionalScrum = getProcessingScrum(event, event.getUser().getName());
+                // 종료할 스크럼이 없는 경우
+                if (optionalScrum.isEmpty()){
+                    event.reply("진행 했던 업무가 없어서 스크럼을 종료할 수 없습니다 ㅠㅠ.. 업무를 시작하여 데이터를 만들어 주세요 !!! ")
                             .setEphemeral(true).queue();
                     return;
                 }
+                log.info("스크럼 문제 X, 통과");
+
+                // 업무가 아직 종료되지 않는 것이 있는 경우
+                Optional<Work> optionWork = getMyProcessingWork(event);
+                if (optionWork.isPresent()){
+                    event.reply("진행 중인 업무가 존재합니다 ㅠㅠ 업무를 종료한 뒤, 스크럼을 종료하여 주세요 ! ")
+                            .setEphemeral(true).queue();
+                    return ;
+                }
+                log.info("업무 문제 X, 통과");
+
+                // 스크럼 종료 대기 중 & 업무도 모두 종료 된 상태 -> 스크럼 종료가 가능한 상태
+                // 해야 하는 일 -> 스크럼 상태 종료, 스크럼 종료 날짜, 스크럼 요약(gpt)
+                Scrum nowScrum = optionalScrum.get();
+                List<String> worksOfUser = workService.findAllByScrum(nowScrum)
+                        .stream().map(w -> w.getContent())
+                        .toList();
+                log.info("스크럼 하위 작업들 조회 성공");
+                try {
+                    String summary = gptService.sendMessage(worksOfUser);
+                    log.info("summary: {}", summary);
+                    scrumService.updateScrum(nowScrum.getId(), summary, nowLocalDate);
+                } catch (JsonProcessingException e) {
+                    event.reply("gpt 요약 기능에서 문제가 생겼어요.. ㅠㅠ 금방 고칠게요 !!")
+                            .setEphemeral(true).queue();
+                    return ;
+                }
+                event.reply("하나의 스크럼이 마무리 됐어요 ~! 앞으로의 스크럼도 화이팅입니다 ~ !\n")
+                        .setEphemeral(true).queue();
                 break;
         }
     }
@@ -188,23 +216,38 @@ public class DiscordListener extends ListenerAdapter {
         return usersWithoutInfo;
     }
     private Team myTeam(SlashCommandInteractionEvent event){
-        return teamService.findByGuildId(event.getGuild().getId());
+        Optional<Team> optionalTeam = teamService.findByGuildId(event.getGuild().getId());
+        if (optionalTeam.isEmpty()){
+            event.reply("먼저 팀을 만들어주세요 !").setEphemeral(true).queue();
+        }
+        return optionalTeam.get();
     }
     private goormthon.team28.startup_valley.domain.User me(SlashCommandInteractionEvent event){
-        return userService.findBySerialId(event.getUser().getName());
+        Optional<goormthon.team28.startup_valley.domain.User> optionalUser = userService.findBySerialId(event.getUser().getName());
+        if (optionalUser.isEmpty()){
+            event.reply("웹에 회원가입을 먼저 진행해주세요 !").setEphemeral(true).queue();
+        }
+        return optionalUser.get();
+    }
+    private goormthon.team28.startup_valley.domain.User getUser(SlashCommandInteractionEvent event, String userId){
+        Optional<goormthon.team28.startup_valley.domain.User> optionalUser = userService.findBySerialId(userId);
+        if (optionalUser.isEmpty()){
+            event.reply("웹에 회원가입을 먼저 진행해주세요 !").setEphemeral(true).queue();
+        }
+        return optionalUser.get();
     }
     private goormthon.team28.startup_valley.domain.Member getMember(SlashCommandInteractionEvent event, String userId){
         return memberService.findByTeamAndUser(
                 myTeam(event),
-                userService.findBySerialId(userId)
+                getUser(event, userId)
         );
     }
-    private Optional<Scrum> getScrum(SlashCommandInteractionEvent event, String userId){
+    private Optional<Scrum> getProcessingScrum(SlashCommandInteractionEvent event, String userId){
         return scrumService.findNowScrum(getMember(event, userId));
     }
-    private Optional<Work> getMyWork(SlashCommandInteractionEvent event){
+    private Optional<Work> getMyProcessingWork(SlashCommandInteractionEvent event){
         String userId = event.getUser().getName();
-        return workService.findNotOverWork(getScrum(event, userId).get(), getMember(event, userId));
+        return workService.findNotOverWork(getProcessingScrum(event, userId).get(), getMember(event, userId));
     }
 
 }
