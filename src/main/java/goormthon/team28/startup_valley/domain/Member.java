@@ -31,10 +31,13 @@ public class Member {
     private Long totalMinute;
     @Column(name = "retrospection")
     private String retrospection;
+    @Column(name = "is_public", nullable = false)
+    private Boolean isPublic;
     @Builder
     public Member(Team team, User user) {
         this.team = team;
         this.user = user;
         this.totalMinute = 0L;
+        this.isPublic = Boolean.TRUE;
     }
 }

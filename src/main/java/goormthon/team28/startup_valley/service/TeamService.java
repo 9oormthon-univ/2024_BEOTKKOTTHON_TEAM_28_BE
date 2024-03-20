@@ -38,7 +38,6 @@ public class TeamService {
                                 .teamImage(image)
                                 .startAt(now)
                                 .status(EProjectStatus.IN_PROGRESS)
-                                .isPublic(true)
                                 .build())
                 );
     }
