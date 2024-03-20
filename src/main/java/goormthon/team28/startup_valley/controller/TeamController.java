@@ -25,4 +25,9 @@ public class TeamController {
     public ResponseDto<?> retrieveTeam(@UserId Long userId, @PathVariable Long teamsId) {
         return ResponseDto.ok(teamService.retrieveTeam(userId, teamsId));
     }
+
+    @GetMapping("/teams/{teamsId}/leader")
+    public ResponseDto<?> listTeamMemberPermission(@UserId Long userId, @PathVariable Long teamsId) {
+        return ResponseDto.ok(teamService.listTeamMemberPermission(userId, teamsId));
+    }
 }
