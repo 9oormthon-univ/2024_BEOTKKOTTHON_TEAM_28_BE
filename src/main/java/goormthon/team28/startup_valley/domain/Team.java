@@ -48,4 +48,8 @@ public class Team {
         this.status = status;
         this.isPublic = isPublic;
     }
+
+    public void changeTeamLeader(Member leader) {
+        this.leader = leader;
+    }
 }
