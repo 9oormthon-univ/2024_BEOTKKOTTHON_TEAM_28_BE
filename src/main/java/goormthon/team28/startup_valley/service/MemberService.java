@@ -66,4 +66,21 @@ public class MemberService {
     public void updateTotalWorkTime(Long memberId, Long totalTime){
         memberRepository.updateTotalMinute(memberId, totalTime);
     }
+
+    @Transactional
+    public Boolean toggleTeamPublic(Long userId, Long membersId) {
+
+        User currentUser = userRepository.findById(userId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+        Member member = memberRepository.findById(membersId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_MEMBER));
+
+        // 수정하려는 멤버가 로그인한 유저와 다를 경우
+        if (!member.getUser().equals(currentUser))
+            throw new CommonException(ErrorCode.MISMATCH_LOGIN_USER_AND_TEAM);
+
+        member.toggleIsPublic();
+
+        return Boolean.TRUE;
+    }
 }

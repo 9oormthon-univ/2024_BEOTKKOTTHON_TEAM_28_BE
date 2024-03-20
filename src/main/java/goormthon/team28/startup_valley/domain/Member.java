@@ -40,4 +40,8 @@ public class Member {
         this.totalMinute = 0L;
         this.isPublic = Boolean.TRUE;
     }
+
+    public void toggleIsPublic() {
+        this.isPublic = this.isPublic ? Boolean.FALSE : Boolean.TRUE;
+    }
 }
