@@ -8,8 +8,8 @@ import java.util.List;
 
 @Builder
 public record WorkMeasureDto(
-        @JsonProperty("userName")
-        String userName,
+        @JsonProperty("userNickName")
+        String userNickname,
         @JsonProperty("totalTime")
         Long totalTime,
         @JsonProperty("workDateCount")
@@ -20,14 +20,14 @@ public record WorkMeasureDto(
         List<WorkDateDto> workDateDtoList
 ) implements Serializable {
     public static WorkMeasureDto of(
-            final String userName,
+            final String userNickname,
             final Long totalTime,
             final Integer workDateCount,
             final Long workMaxTime,
             final List<WorkDateDto> workDateDtoList
     ) {
         return WorkMeasureDto.builder()
-                .userName(userName)
+                .userNickname(userNickname)
                 .totalTime(totalTime)
                 .workDateCount(workDateCount)
                 .workMaxTime(workMaxTime)

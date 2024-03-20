@@ -182,4 +182,43 @@ public class WorkService {
                 workDateDtoList
         );
     }
+
+    public WorkMeasureDto measureAllWork(Long userId, Long membersId) {
+
+        Member targetMember = memberRepository.findById(membersId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_MEMBER));
+        User targetUser = targetMember.getUser();
+        List<Member> memberList = memberRepository.findAllByUser(targetUser).stream()
+                .filter(Member::getIsPublic)
+                .toList();
+
+        List<WorkDateDto> workDateDtoList = new ArrayList<>();
+        for (Member tempMember : memberList) {
+            List<Work> workList = workRepository.findAllByOwner(tempMember);
+            workDateDtoList.addAll(
+                    workList.stream()
+                            .map(work -> WorkDateDto.of(
+                                    work.getStartAt().toLocalDate(),
+                                    Duration.between(work.getStartAt(), work.getEndAt()).toMinutes()
+                            ))
+                            .toList()
+            );
+        }
+
+        Long totalTime = workDateDtoList.stream()
+                .mapToLong(WorkDateDto::time)
+                .sum();
+
+        Optional<Long> maxTime = workDateDtoList.stream()
+                .map(WorkDateDto::time)
+                .max(Long::compareTo);
+
+        return WorkMeasureDto.of(
+                targetUser.getNickname(),
+                totalTime,
+                workDateDtoList.size(),
+                maxTime.orElse(0L),
+                workDateDtoList
+        );
+    }
 }

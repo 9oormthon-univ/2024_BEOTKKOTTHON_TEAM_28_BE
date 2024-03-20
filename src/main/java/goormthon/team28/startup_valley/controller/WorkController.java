@@ -43,4 +43,9 @@ public class WorkController {
     public ResponseDto<?> measureTeamMemberWork(@UserId Long userId, @PathVariable Long membersId) {
         return ResponseDto.ok(workService.measureTeamMemberWork(userId, membersId));
     }
+
+    @GetMapping("/members/{membersId}/works/measure-all")
+    public ResponseDto<?> measureAllWork(@UserId Long userId, @PathVariable Long membersId) {
+        return ResponseDto.ok(workService.measureAllWork(userId, membersId));
+    }
 }
