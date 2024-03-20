@@ -52,6 +52,14 @@ public class QuestionService {
                 .build()
         );
     }
+    public Question findByCode(String code){
+        return questionRepository.findByCodeAndStatus(code,EQuestionStatus.WAITING_ANSWER)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_QUESTION));
+    }
+    @Transactional
+    public void updateQuestionStatus(Question question,EQuestionStatus status){
+        questionRepository.updateQuestionStatus(question.getId(), null, status);
+    }
 
     public QuestionListDto listWaitingQuestion(Long userId, Long teamsId) {
         User currentUser = userRepository.findById(userId)
