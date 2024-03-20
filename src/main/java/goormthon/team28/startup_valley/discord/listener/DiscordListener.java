@@ -79,6 +79,7 @@ public class DiscordListener extends ListenerAdapter {
                 User receiver = event.getOption("receiver").getAsUser();
                 String receiverId = receiver.getName();
                 String questionContent = event.getOption("question_content").getAsString();
+
                 // 질문 생성
                 Question question = questionService.saveQuestion(guildId, senderId, receiverId, questionContent, nowLocalDateTime);
 
@@ -202,6 +203,27 @@ public class DiscordListener extends ListenerAdapter {
                 }
                 event.reply("하나의 스크럼이 마무리 됐어요 ~! 앞으로의 스크럼도 화이팅입니다 ~ !\n")
                         .setEphemeral(true).queue();
+                break;
+
+            case "프로젝트종료":
+                Team project = myTeam(event);
+                // 리더가 아닌 경우
+                if (!project.getLeader().getId().equals(getMember(event, event.getUser().getName()).getId())){
+                    event.reply("프로젝트의 리더가 프로젝트의 상태를 변경할 수 있어요 !")
+                            .setEphemeral(true).queue();
+                    return ;
+                }
+                // 프로젝트 상태 동료 평가 단계로 변경
+                teamService.updateStatus(project.getId());
+                event.reply("프로젝트의 상태가 변경 되었습니다 !")
+                        .setEphemeral(true).queue();
+                // 팀원들에게 알림
+                event.getGuild().getTextChannelById(event.getChannel().getId())
+                        .sendMessage("@everyone ! 프로젝트는 잘 마무리 되었나요 ?! \n\n" +
+                                "프로젝트의 개발 기간이 끝나고 동료평가 단계로 넘어가게 되었습니다 ! \n\n" +
+                                "서로의 평가를 통해 한층 더 성장하세요 !!" )
+                        .queue();
+
                 break;
         }
     }
