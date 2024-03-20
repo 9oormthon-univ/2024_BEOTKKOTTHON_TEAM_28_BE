@@ -20,4 +20,18 @@ public class QuestionController {
     public ResponseDto<?> listWaitingQuestion(@UserId Long userId, @PathVariable Long teamsId) {
         return ResponseDto.ok(questionService.listWaitingQuestion(userId, teamsId));
     }
+
+//    @GetMapping("/teams/{teamsId}/questions/received")
+//    public ResponseDto<?> listReceivedQuestion(@UserId Long userId, @PathVariable Long teamsId) {
+//        return ResponseDto.ok(questionService.listReceivedQuestion(userId, teamsId));
+//    }
+
+    @PostMapping("/team/{teamsId}/questions")
+    public ResponseDto<?> postQuestion(
+            @UserId Long userId,
+            @PathVariable Long teamsId,
+            @RequestBody QuestionCreateDto questionCreateDto
+            ) {
+        return ResponseDto.created(questionService.postQuestion(userId, teamsId, questionCreateDto));
+    }
 }

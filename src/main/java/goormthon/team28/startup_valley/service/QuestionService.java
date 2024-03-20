@@ -75,4 +75,34 @@ public class QuestionService {
 
         return QuestionListDto.of(questionDtoList, questionDtoList.size());
     }
+
+   @Transactional
+    public Boolean postQuestion(Long userId, Long teamsId, QuestionCreateDto questionCreateDto) {
+
+        User senderUser = userRepository.findById(userId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+        Team senderTeam = teamRepository.findById(teamsId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_TEAM));
+        Member senderMember = memberRepository.findByTeamAndUser(senderTeam, senderUser)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_MEMBER));
+        Member receiverMember = memberRepository.findById(questionCreateDto.memberId())
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_MEMBER));
+        if (!senderMember.getTeam().equals(receiverMember.getTeam()))
+            throw new CommonException(ErrorCode.MISMATCH_TEAM);
+
+        String code = NumberUtil.generateRandomCode();
+        while(questionRepository.existsByCode(code))
+            code = NumberUtil.generateRandomCode();
+        Question question = Question.builder()
+                                    .sender(senderMember)
+                                    .receiver(receiverMember)
+                                    .content(questionCreateDto.content())
+                                    .content(LocalDateTime.now().toString())
+                                    .status(EQuestionStatus.WAITING_ANSWER)
+                                    .code(code)
+                                    .build();
+        questionRepository.save(question);
+
+        return Boolean.TRUE;
+    }
 }
