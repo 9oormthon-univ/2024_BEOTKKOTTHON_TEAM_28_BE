@@ -57,7 +57,8 @@ public class StartupValleyApplication {
 				Commands.slash("업무종료", "오늘의 업무를 종료해요 ! 업무 내용과 함께 기입해주세요 ~ !")
 						.addOption(OptionType.STRING, "work_list", "오늘의 업무 내용을 '; '을 통해서 구분하여 작성해주세요 !! ", true),
 				Commands.slash("스크럼종료", "지금까지의 업무들로 하나의 스크럼을 생성해요 ! "),
-				Commands.slash("프로젝트종료", "프로젝트의 리더가 결정 할 수 있어요 !  종료하고 동료평가 단계로 넘어가요 ! ")
+				Commands.slash("프로젝트종료", "프로젝트의 리더가 결정 할 수 있어요 !  종료하고 동료평가 단계로 넘어가요 ! "),
+				Commands.slash("서버최신화", "디스코드의 서버 이름과 이미지의 변경점을 웹에 적용해요 ! ")
 		).queue();
 	}
 
