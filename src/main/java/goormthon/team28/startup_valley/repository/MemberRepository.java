@@ -16,5 +16,6 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     Boolean existsByUserAndTeam(User user, Team team);
     List<Member> findAllByTeam(Team team);
     List<Member> findAllByTeamOrderByTotalMinuteDesc(Team team);
+    List<Member> findAllByUser(User user);
     Optional<Member> findByTeamAndUser(Team team, User user);
 }
