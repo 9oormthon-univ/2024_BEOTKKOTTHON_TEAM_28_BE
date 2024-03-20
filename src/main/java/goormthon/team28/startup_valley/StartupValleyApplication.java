@@ -38,7 +38,8 @@ public class StartupValleyApplication {
 						context.getBean(QuestionService.class),
 						context.getBean(AnswerService.class),
 						context.getBean(ScrumService.class),
-						context.getBean(WorkService.class)
+						context.getBean(WorkService.class),
+						context.getBean(GptService.class)
 						)
 				)
 				.build();
@@ -54,7 +55,8 @@ public class StartupValleyApplication {
 						.addOption(OptionType.STRING, "answer_content", "답변 내용을 작성해주세요 !", true),
 				Commands.slash("업무시작", "오늘의 업무 시간을 시작해요 !"),
 				Commands.slash("업무종료", "오늘의 업무를 종료해요 ! 업무 내용과 함께 기입해주세요 ~ !")
-						.addOption(OptionType.STRING, "work_list", "오늘의 업무 내용을 '; '을 통해서 구분하여 작성해주세요 !! ", true)
+						.addOption(OptionType.STRING, "work_list", "오늘의 업무 내용을 '; '을 통해서 구분하여 작성해주세요 !! ", true),
+				Commands.slash("스크럼종료", "지금까지의 업무들로 하나의 스크럼을 생성해요 ! ")
 		).queue();
 	}
 

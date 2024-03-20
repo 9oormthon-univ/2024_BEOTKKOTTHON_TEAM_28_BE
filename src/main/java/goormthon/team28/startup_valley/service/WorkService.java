@@ -44,6 +44,9 @@ public class WorkService {
         return workRepository.findById(workId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_WORK));
     }
+    public List<Work> findAllByScrum(Scrum scrum){
+        return workRepository.findAllByScrum(scrum);
+    }
 
     public Optional<Work> findNotOverWork(Scrum scrum, Member member){
         return workRepository.findByScrumAndOwnerAndEndAtIsNull(scrum, member);

@@ -41,6 +41,10 @@ public class ScrumService {
                         .build())
                 );
     }
+    @Transactional
+    public void updateScrum(Long scrumId, String summary, LocalDate now){
+        scrumRepository.updateScrumAfterOver(scrumId, summary, EScrumStatus.FINISH, now);
+    }
 
     public ScrumListDto listScrum(Long userId, Long membersId) {
 

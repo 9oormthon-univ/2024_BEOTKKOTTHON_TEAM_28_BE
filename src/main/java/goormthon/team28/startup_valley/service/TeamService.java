@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -41,9 +42,8 @@ public class TeamService {
                                 .build())
                 );
     }
-    public Team findByGuildId(String guildId) {
-        return teamRepository.findByGuildId(guildId)
-                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_TEAM));
+    public Optional<Team> findByGuildId(String guildId) {
+        return teamRepository.findByGuildId(guildId);
     }
     @Transactional
     public void updateLeader(Long teamId, Member member){
