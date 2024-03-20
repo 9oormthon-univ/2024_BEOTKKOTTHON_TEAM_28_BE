@@ -30,7 +30,6 @@ public class ScrumService {
     private final UserRepository userRepository;
     private final MemberRepository memberRepository;
     private final WorkRepository workRepository;
-    private final TeamRepository teamRepository;
 
     @Transactional
     public Scrum saveScrum(Member member, LocalDate now){
