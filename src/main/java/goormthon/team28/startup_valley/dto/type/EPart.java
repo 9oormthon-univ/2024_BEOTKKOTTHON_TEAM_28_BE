@@ -1,7 +1,5 @@
 package goormthon.team28.startup_valley.dto.type;
 
-import goormthon.team28.startup_valley.exception.CommonException;
-import goormthon.team28.startup_valley.exception.ErrorCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;

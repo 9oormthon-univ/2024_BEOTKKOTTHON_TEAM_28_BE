@@ -134,7 +134,7 @@ public class QuestionService {
                                     .sender(senderMember)
                                     .receiver(receiverMember)
                                     .content(questionCreateDto.content())
-                                    .content(LocalDateTime.now().toString())
+                                    .createdAt(LocalDateTime.now())
                                     .status(EQuestionStatus.WAITING_ANSWER)
                                     .code(code)
                                     .build();
