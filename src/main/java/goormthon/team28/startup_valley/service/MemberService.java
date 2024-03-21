@@ -77,7 +77,6 @@ public class MemberService {
     public void updatePart(Long memberId, EPart part){
         memberRepository.updatePart(memberId, part);
     }
-
     @Transactional
     public Boolean toggleTeamPublic(Long userId, Long membersId) {
 
@@ -123,6 +122,7 @@ public class MemberService {
         );
     }
 
+    @Transactional
     public Boolean patchRetrospectionMember(
             Long userId,
             Long teamsId,

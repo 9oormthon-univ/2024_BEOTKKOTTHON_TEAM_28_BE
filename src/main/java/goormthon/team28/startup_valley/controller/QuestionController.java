@@ -29,7 +29,7 @@ public class QuestionController {
         return ResponseDto.ok(questionService.listReceivedQuestion(userId, teamsId, Boolean.FALSE));
     }
 
-    @PostMapping("/team/{teamsId}/questions")
+    @PostMapping("/teams/{teamsId}/questions")
     public ResponseDto<?> postQuestion(
             @UserId Long userId,
             @PathVariable Long teamsId,

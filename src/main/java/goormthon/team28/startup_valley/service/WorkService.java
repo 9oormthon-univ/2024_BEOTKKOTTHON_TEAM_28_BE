@@ -131,6 +131,7 @@ public class WorkService {
         return WorkManageListDto.of(workManageDtoList);
     }
 
+    @Transactional
     public Boolean patchManageWork(Long userId, Long membersId, Long worksId, WorkTimeDto workTimeDto) {
 
         User currentUser = userRepository.findById(userId)
