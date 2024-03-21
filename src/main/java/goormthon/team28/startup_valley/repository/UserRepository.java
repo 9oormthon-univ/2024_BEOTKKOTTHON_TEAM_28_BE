@@ -20,7 +20,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     void updateRefreshTokenAndLoginStatus(Long userId, String refreshToken);
     Optional<User> findById(Long userId);
     Optional<User> findBySerialId(String serialId);
-
     boolean existsBySerialId(String serialId);
 
     interface UserSecurityForm {

@@ -32,6 +32,7 @@ public class Scrum {
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
     private EScrumStatus status;
+  
     @Builder
     public Scrum(LocalDate startAt, Member worker) {
         this.startAt = startAt;
