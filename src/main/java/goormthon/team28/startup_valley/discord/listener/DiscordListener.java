@@ -138,6 +138,7 @@ public class DiscordListener extends ListenerAdapter {
                 }
 
                 answerService.saveAnswer(findQuestion, speaker, answerContent, nowLocalDateTime);
+
                 questionService.updateQuestionStatus(findQuestion, EQuestionStatus.FINISH);
 
                 event.reply("답변이 등록 되었습니다 ! ").setEphemeral(true).queue();
@@ -195,6 +196,7 @@ public class DiscordListener extends ListenerAdapter {
                     event.reply(event.getMember().getAsMention() +"님이 역할을 아직 입력하지 않으셨어요 ㅠㅠ 역할 입력 해주세요 ~ !").setEphemeral(true).queue();
                     return ;
                 }
+
                 Long totalTime = worker.getTotalMinute() + todayWork;
 
                 // 업무 시간 DB 반영
