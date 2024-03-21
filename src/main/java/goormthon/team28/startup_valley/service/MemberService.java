@@ -122,6 +122,7 @@ public class MemberService {
         );
     }
 
+    @Transactional
     public Boolean patchRetrospectionMember(
             Long userId,
             Long teamsId,
