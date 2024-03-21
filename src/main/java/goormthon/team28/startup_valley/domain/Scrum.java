@@ -3,6 +3,7 @@ package goormthon.team28.startup_valley.domain;
 import goormthon.team28.startup_valley.dto.type.EScrumStatus;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicUpdate;
@@ -31,6 +32,11 @@ public class Scrum {
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
     private EScrumStatus status;
-
-
+  
+    @Builder
+    public Scrum(LocalDate startAt, Member worker) {
+        this.startAt = startAt;
+        this.worker = worker;
+        this.status = EScrumStatus.IN_PROGRESS;
+    }
 }

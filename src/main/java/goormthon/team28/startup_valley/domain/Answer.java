@@ -2,6 +2,7 @@ package goormthon.team28.startup_valley.domain;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicUpdate;
@@ -25,4 +26,14 @@ public class Answer {
     private String content;
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id")
+    private Member member;
+    @Builder
+    public Answer(Question question, Member member, String content, LocalDateTime createdAt) {
+        this.question = question;
+        this.member = member;
+        this.content = content;
+        this.createdAt = createdAt;
+    }
 }

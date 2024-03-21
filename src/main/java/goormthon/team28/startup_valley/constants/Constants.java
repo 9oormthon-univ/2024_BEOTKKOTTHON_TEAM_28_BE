@@ -10,7 +10,7 @@ public class Constants {
     public static String ACCESS_COOKIE_NAME = "access_token";
     public static String REFRESH_COOKIE_NAME = "refresh_token";
     public static List<String> NO_NEED_AUTH = List.of(
-            "/api/v1/auth/sign-up",
-            "/api/v1/auth/sign-in"
+            "/api/auth/sign-up",
+            "/api/auth/sign-in"
     );
 }
