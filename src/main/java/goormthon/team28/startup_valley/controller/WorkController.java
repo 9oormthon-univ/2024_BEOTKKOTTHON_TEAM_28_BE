@@ -24,12 +24,12 @@ public class WorkController {
         return ResponseDto.ok(workService.getRanking(userId, teamsId));
     }
 
-    @GetMapping("/member/{membersId}/works")
+    @GetMapping("/members/{membersId}/works")
     public ResponseDto<?> listManageWork(@UserId Long userId, @PathVariable Long membersId) {
         return ResponseDto.ok(workService.listManageWork(userId, membersId));
     }
 
-    @PatchMapping("/member/{membersId}/works/{worksId}")
+    @PatchMapping("/members/{membersId}/works/{worksId}")
     public ResponseDto<?> patchManageWork(
             @UserId Long userId,
             @PathVariable Long membersId,
@@ -37,5 +37,15 @@ public class WorkController {
             @RequestBody WorkTimeDto workTimeDto
             ) {
         return ResponseDto.ok(workService.patchManageWork(userId, membersId, worksId, workTimeDto));
+    }
+
+    @GetMapping("/members/{membersId}/works/measure-one")
+    public ResponseDto<?> measureTeamMemberWork(@UserId Long userId, @PathVariable Long membersId) {
+        return ResponseDto.ok(workService.measureTeamMemberWork(userId, membersId));
+    }
+
+    @GetMapping("/members/{membersId}/works/measure-all")
+    public ResponseDto<?> measureAllWork(@UserId Long userId, @PathVariable Long membersId) {
+        return ResponseDto.ok(workService.measureAllWork(userId, membersId));
     }
 }
