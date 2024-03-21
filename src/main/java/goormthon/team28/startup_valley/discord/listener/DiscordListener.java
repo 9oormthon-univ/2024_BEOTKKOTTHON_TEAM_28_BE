@@ -48,13 +48,13 @@ public class DiscordListener extends ListenerAdapter {
                 List<String> noSignUp = findNoSignUp(discordMembers);
                 if (noSignUp.isEmpty()){ // 모두 회원가입을 한 경우
                     // 팀을 생성하거나 조회한다
-                    Team team = teamService.saveTeam(event.getGuild().getId(), event.getGuild().getName(), event.getGuild().getIconUrl(), nowLocalDate);
+                    Team team = teamService.saveOrGetTeam(event.getGuild().getId(), event.getGuild().getName(), event.getGuild().getIconUrl(), nowLocalDate);
                     log.info("팀 생성 완료");
 
                     // 팀의 멤버를 생성하거나 조회한다.
                     discordMembers.forEach(
                             discordMember -> {
-                                goormthon.team28.startup_valley.domain.Member teamMember = memberService.saveMember(
+                                goormthon.team28.startup_valley.domain.Member teamMember = memberService.saveOrGetMember(
                                         team,
                                         getUser(event, discordMember.getUser().getName())
                                 );
@@ -122,13 +122,12 @@ public class DiscordListener extends ListenerAdapter {
 
             case "업무시작":
                 // 팀, 사용자 조회 -> 팀 멤버 조회
-                Team team = teamService.saveTeam(event.getGuild().getId(), event.getGuild().getName(), event.getGuild().getIconUrl(), nowLocalDate);
-                goormthon.team28.startup_valley.domain.Member member = memberService.saveMember(team, me(event));
+                Team team = myTeam(event);
+                goormthon.team28.startup_valley.domain.Member member = getMember(event, event.getUser().getName());
 
                 // 스크럼 생성 또는 조회
-                Scrum scrum = scrumService.saveScrum(member, nowLocalDate);
-
-                if (workService.findNotOverWork(scrum, member).isPresent()){
+                Scrum scrum = scrumService.saveOrGetScrum(member, nowLocalDate);
+                if (getMyProcessingWork(event).isPresent()){
                     event.reply("이전의 업무가 존재합니다 ㅠㅠ, 기존 업무를 종료하고 새로운 작업을 시작해주세요 ! ")
                             .setEphemeral(true).queue();
                     return;
@@ -152,10 +151,10 @@ public class DiscordListener extends ListenerAdapter {
                             .setEphemeral(true).queue();
                     return;
                 }
-
+                Work nowWork = optionalWork.get();
                 // 현재 진행 중인 작업의 종료 데이터 업데이트 & 조회
-                workService.updateWorkAfterOver(optionalWork.get().getId(), workList, nowLocalDateTime);
-                Work myWork = workService.findById(optionalWork.get().getId());
+                workService.updateWorkAfterOver(nowWork.getId(), workList, nowLocalDateTime);
+                Work myWork = workService.findById(nowWork.getId());
 
                 // 오늘의 업무 작업 시간 계산
                 long todayWork = Duration.between(myWork.getStartAt(), myWork.getEndAt()).toMinutes();
@@ -216,7 +215,8 @@ public class DiscordListener extends ListenerAdapter {
                 Team project = myTeam(event);
                 // 리더가 아닌 경우
                 if (!project.getLeader().getId().equals(getMember(event, event.getUser().getName()).getId())){
-                    event.reply("프로젝트의 리더가 프로젝트의 상태를 변경할 수 있어요 !")
+                    event.reply("프로젝트의 리더가 프로젝트의 상태를 변경할 수 있어요 ! \n\n" +
+                                    event.getMember().getAsMention() + "님은 프로젝트의 리더가 아닙니다..ㅠㅠ")
                             .setEphemeral(true).queue();
                     return ;
                 }
@@ -278,13 +278,21 @@ public class DiscordListener extends ListenerAdapter {
         return optionalUser.get();
     }
     private goormthon.team28.startup_valley.domain.Member getMember(SlashCommandInteractionEvent event, String userId){
-        return memberService.findByTeamAndUser(
+        Optional<goormthon.team28.startup_valley.domain.Member> findMember = memberService.findByTeamAndUser(
                 myTeam(event),
                 getUser(event, userId)
         );
+        if (findMember.isEmpty()){
+            event.reply("팀원을 조회할 수 없습니다 ㅠㅠ. 팀원 업데이트를 통해 변경 사항을 적용해주세요 ~ !").setEphemeral(true).queue();
+        }
+        return findMember.get();
     }
     private Optional<Scrum> getProcessingScrum(SlashCommandInteractionEvent event, String userId){
-        return scrumService.findNowScrum(getMember(event, userId));
+        Optional<Scrum> nowScrum = scrumService.findNowScrum(getMember(event, userId));
+        if (nowScrum.isEmpty()){
+            event.reply("시작된 작업을 찾을 수 없습니다 ㅠㅠ, 작업을 먼저 시작해주세요").setEphemeral(true).queue();
+        }
+        return nowScrum;
     }
     private Optional<Work> getMyProcessingWork(SlashCommandInteractionEvent event){
         String userId = event.getUser().getName();
