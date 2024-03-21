@@ -29,19 +29,15 @@ public class QuestionService {
     private final UserRepository userRepository;
     private final TeamRepository teamRepository;
     private final MemberRepository memberRepository;
-    private final TeamService teamService;
-    private final MemberService memberService;
-    private final UserService userService;
     @Transactional
-    public Question saveQuestion(String guildId, String senderId, String receiverId, String content, LocalDateTime time){
+    public Question saveQuestion(Member sender, Member receiver, String content, LocalDateTime time){
         String code = NumberUtil.generateRandomCode();
         while(questionRepository.existsByCode(code)){
             code = NumberUtil.generateRandomCode();
         }
-        Team findTeam = teamService.findByGuildId(guildId).get();
         return questionRepository.save(Question.builder()
-                        .sender(memberService.findByTeamAndUser(findTeam, userService.findBySerialId(senderId).get()))
-                        .receiver(memberService.findByTeamAndUser(findTeam, userService.findBySerialId(receiverId).get()))
+                        .sender(sender)
+                        .receiver(receiver)
                         .content(content)
                         .status(EQuestionStatus.WAITING_ANSWER)
                         .createdAt(time)
@@ -49,9 +45,8 @@ public class QuestionService {
                 .build()
         );
     }
-    public Question findByCode(String code){
-        return questionRepository.findByCodeAndStatus(code,EQuestionStatus.WAITING_ANSWER)
-                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_QUESTION));
+    public Optional<Question> findByCode(String code){
+        return questionRepository.findByCodeAndStatus(code,EQuestionStatus.WAITING_ANSWER);
     }
     @Transactional
     public void updateQuestionStatus(Question question,EQuestionStatus status){
