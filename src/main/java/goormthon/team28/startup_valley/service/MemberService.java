@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -55,7 +56,7 @@ public class MemberService {
     }
 
     @Transactional
-    public Member saveMember(Team team, User user){
+    public Member saveOrGetMember(Team team, User user){
         return memberRepository.findByTeamAndUser(team, user)
                 .orElseGet(() -> memberRepository.save(Member.builder()
                         .team(team)
@@ -63,9 +64,8 @@ public class MemberService {
                         .build())
                 );
     }
-    public Member findByTeamAndUser(Team team, User user){
-        return memberRepository.findByTeamAndUser(team, user)
-                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_MEMBER));
+    public Optional<Member> findByTeamAndUser(Team team, User user){
+        return memberRepository.findByTeamAndUser(team, user);
     }
     @Transactional
     public void updateTotalWorkTime(Long memberId, Long totalTime){
