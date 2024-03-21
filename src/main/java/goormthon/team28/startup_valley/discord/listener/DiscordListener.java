@@ -20,10 +20,7 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -61,7 +58,9 @@ public class DiscordListener extends ListenerAdapter {
                                         team,
                                         getUser(event, discordMember.getUser().getName())
                                 );
-                                if (teamMember.getUser().getSerialId().equals(event.getGuild().getOwner().getUser().getName())){
+                                //  처음 팀을 생성한 경우 -> 팀의 리더를 디스코드 서버의 주인으로 지정
+                                if (team.getLeader() == null &&
+                                        teamMember.getUser().getSerialId().equals(event.getGuild().getOwner().getUser().getName())){
                                     teamService.updateLeader(team.getId(), teamMember);
                                 }
                             }
@@ -74,20 +73,21 @@ public class DiscordListener extends ListenerAdapter {
                 break;
 
             case "질문하기":
-                String guildId = event.getGuild().getId();
-                String senderId = event.getMember().getUser().getName();
-                User receiver = event.getOption("receiver").getAsUser();
-                String receiverId = receiver.getName();
+                User discordReceiver = event.getOption("receiver").getAsUser();
                 String questionContent = event.getOption("question_content").getAsString();
 
+                // 발생할 예외에 대한 처리 & 객체 조회
+                goormthon.team28.startup_valley.domain.Member sender = getMember(event, event.getMember().getUser().getName());
+                goormthon.team28.startup_valley.domain.Member receiver = getMember(event, discordReceiver.getName());
+
                 // 질문 생성
-                Question question = questionService.saveQuestion(guildId, senderId, receiverId, questionContent, nowLocalDateTime);
+                Question question = questionService.saveQuestion(sender, receiver, questionContent, nowLocalDateTime);
 
                 // 질문 생성 완료, 질문자에게 알리는 내용
                 event.reply("질문이 등록 되었습니다 ! ").setEphemeral(true).queue();
                 // 질문 생성 완료, 답변자 및 팀원에게 알리는 내용
                 event.getGuild().getTextChannelById(event.getChannel().getId())
-                        .sendMessage(receiver.getAsMention() + "님! 답변을 기다리는 질문이 생성되었어요 ! \n\n" +
+                        .sendMessage(discordReceiver.getAsMention() + "님! 답변을 기다리는 질문이 생성되었어요 ! \n\n" +
                                 "디스코드를 통해 답변하는 경우에는 이 코드를 사용해주세요 ! code: "+ question.getCode() + "\n\n" +
                                 "질문한 사람: " + event.getMember().getAsMention() + "\n\n" +
                                 "질문 내용: " + questionContent)
@@ -96,13 +96,20 @@ public class DiscordListener extends ListenerAdapter {
                 break;
 
             case "답변하기":
-                String code = event.getOption("code").getAsString();
-                Member maker = event.getOption("receiver").getAsMember();
-                String answerContent = event.getOption("answer_content").getAsString();
+                String code = Objects.requireNonNull(event.getOption("code")).getAsString();
+                Member maker = Objects.requireNonNull(event.getOption("receiver")).getAsMember();
+                String answerContent = Objects.requireNonNull(event.getOption("answer_content")).getAsString();
 
-                Question findQuestion = questionService.findByCode(code);
+                // 답변 예외처리
+                Optional<Question> optionalQuestion = questionService.findByCode(code);
+                if (optionalQuestion.isEmpty()){
+                    event.reply("잘못된 코드 입니다, 코드를 확인해주세요 ~ !").setEphemeral(true).queue();
+                    return ;
+                }
+                // 실제 질문 객체 조회
+                Question findQuestion = optionalQuestion.get();
 
-                answerService.saveAnswer(findQuestion, getMember(event, event.getUser().getName()),answerContent, nowLocalDateTime);
+                answerService.saveAnswer(findQuestion, getMember(event, event.getUser().getName()), answerContent, nowLocalDateTime);
                 questionService.updateQuestionStatus(findQuestion, EQuestionStatus.FINISH);
 
                 event.reply("답변이 등록 되었습니다 ! ").setEphemeral(true).queue();
@@ -121,7 +128,7 @@ public class DiscordListener extends ListenerAdapter {
                 // 스크럼 생성 또는 조회
                 Scrum scrum = scrumService.saveScrum(member, nowLocalDate);
 
-                if (!workService.findNotOverWork(scrum, member).isEmpty()){
+                if (workService.findNotOverWork(scrum, member).isPresent()){
                     event.reply("이전의 업무가 존재합니다 ㅠㅠ, 기존 업무를 종료하고 새로운 작업을 시작해주세요 ! ")
                             .setEphemeral(true).queue();
                     return;
@@ -136,7 +143,7 @@ public class DiscordListener extends ListenerAdapter {
                 break;
 
             case "업무종료":
-                String workList = event.getOption("work_list").getAsString();
+                String workList = Objects.requireNonNull(event.getOption("work_list")).getAsString();
 
                 // 현재 내가 진행 중인 작업 조회하기
                 Optional<Work> optionalWork = getMyProcessingWork(event);
@@ -153,7 +160,7 @@ public class DiscordListener extends ListenerAdapter {
                 // 오늘의 업무 작업 시간 계산
                 long todayWork = Duration.between(myWork.getStartAt(), myWork.getEndAt()).toMinutes();
                 goormthon.team28.startup_valley.domain.Member worker = getMember(event, event.getUser().getName());
-                Long totalTime = Long.valueOf(worker.getTotalMinute() + todayWork);
+                Long totalTime = worker.getTotalMinute() + todayWork;
 
                 // 업무 시간 DB 반영
                 memberService.updateTotalWorkTime(worker.getId(), totalTime);
@@ -189,7 +196,7 @@ public class DiscordListener extends ListenerAdapter {
                 // 해야 하는 일 -> 스크럼 상태 종료, 스크럼 종료 날짜, 스크럼 요약(gpt)
                 Scrum nowScrum = optionalScrum.get();
                 List<String> worksOfUser = workService.findAllByScrum(nowScrum)
-                        .stream().map(w -> w.getContent())
+                        .stream().map(Work::getContent)
                         .toList();
                 log.info("스크럼 하위 작업들 조회 성공");
                 try {
@@ -252,7 +259,7 @@ public class DiscordListener extends ListenerAdapter {
     private Team myTeam(SlashCommandInteractionEvent event){
         Optional<Team> optionalTeam = teamService.findByGuildId(event.getGuild().getId());
         if (optionalTeam.isEmpty()){
-            event.reply("먼저 팀을 만들어주세요 !").setEphemeral(true).queue();
+            event.reply("팀원업데이트를 통해 팀을 만들어주세요 !").setEphemeral(true).queue();
         }
         return optionalTeam.get();
     }
