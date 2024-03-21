@@ -4,6 +4,7 @@ import goormthon.team28.startup_valley.domain.Member;
 import goormthon.team28.startup_valley.domain.Scrum;
 import goormthon.team28.startup_valley.domain.Team;
 import goormthon.team28.startup_valley.domain.User;
+import goormthon.team28.startup_valley.dto.request.MemberRetrospectionDto;
 import goormthon.team28.startup_valley.dto.response.MemberContributionDto;
 import goormthon.team28.startup_valley.dto.response.MemberDto;
 import goormthon.team28.startup_valley.dto.response.MemberListDto;
@@ -115,5 +116,22 @@ public class MemberService {
                 targetMember.getPeerReviewSummary(),
                 scrumContributionDtoList
         );
+    }
+
+    public Boolean patchRetrospectionMember(
+            Long userId,
+            Long teamsId,
+            MemberRetrospectionDto memberRetrospectionDto
+    ) {
+        User currentUser = userRepository.findById(userId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+        Team team = teamRepository.findById(teamsId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_TEAM));
+        Member currentMember = memberRepository.findByTeamAndUser(team, currentUser)
+                .orElseThrow(() -> new CommonException(ErrorCode.MISMATCH_LOGIN_USER_AND_TEAM));
+
+        currentMember.updateRetrospection(memberRetrospectionDto.content());
+
+        return Boolean.TRUE;
     }
 }
