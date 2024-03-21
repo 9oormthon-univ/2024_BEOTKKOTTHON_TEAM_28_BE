@@ -47,7 +47,7 @@ public class ReviewService {
                         member.getUser().getNickname(),
                         member.getUser().getProfileImage(),
                         member.getPart(),
-                        reviewRepository.findBySender(member)
+                        reviewRepository.findBySender(currentMember)
                                 .map(Review::getContent)
                                 .orElse(null)
                 ))
