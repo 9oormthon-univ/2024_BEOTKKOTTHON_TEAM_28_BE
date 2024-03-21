@@ -30,7 +30,7 @@ public class TeamService {
     private final TeamRepository teamRepository;
 
     @Transactional
-    public Team saveTeam(String guildId, String name, String image, LocalDate now){
+    public Team saveOrGetTeam(String guildId, String name, String image, LocalDate now){
         return teamRepository.findByGuildId(guildId)
                 .orElseGet(() -> teamRepository.save(
                         Team.builder()

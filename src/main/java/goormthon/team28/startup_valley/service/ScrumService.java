@@ -33,7 +33,7 @@ public class ScrumService {
     private final WorkRepository workRepository;
 
     @Transactional
-    public Scrum saveScrum(Member member, LocalDate now){
+    public Scrum saveOrGetScrum(Member member, LocalDate now){
         return scrumRepository.findByWorkerAndStatus(member, EScrumStatus.IN_PROGRESS)
                 .orElseGet(() -> scrumRepository.save(Scrum.builder()
                                 .worker(member)
