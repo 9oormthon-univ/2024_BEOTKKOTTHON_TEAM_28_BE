@@ -5,6 +5,7 @@ import goormthon.team28.startup_valley.domain.Question;
 import goormthon.team28.startup_valley.domain.Scrum;
 import goormthon.team28.startup_valley.domain.Team;
 import goormthon.team28.startup_valley.domain.Work;
+import goormthon.team28.startup_valley.dto.type.EPart;
 import goormthon.team28.startup_valley.dto.type.EQuestionStatus;
 import goormthon.team28.startup_valley.service.*;
 import lombok.RequiredArgsConstructor;
@@ -66,10 +67,22 @@ public class DiscordListener extends ListenerAdapter {
                             }
                     );
                     log.info("멤버 생성 완료");
-                    event.reply("팀 과 팀 멤버를 연결했어요! 좋은 협업이 되길 기대합니다!").setEphemeral(true).queue();
+                    event.reply("팀 과 팀 멤버를 연결했어요! '파트입력하기' 명령어를 통해 역할을 알려주세요 !!").setEphemeral(true).queue();
                 } else {
                     event.reply("웹에 회원가입이 필요합니다!\n\n" + "회원가입 해주세요 !! : " + noSignUp.toString()).setEphemeral(true).queue();
                 }
+                break;
+
+            case "파트입력하기":
+                EPart part = EPart.fromName(event.getOption("part").getAsString(), event);
+                goormthon.team28.startup_valley.domain.Member me = getMember(event, event.getUser().getName());
+
+                // 팀원 파트 입력하기
+                memberService.updatePart(me.getId(), part);
+
+                event.reply(event.getUser().getAsMention() + " 파트 입력까지 완료 되었습니다 !, 앞으로의 멋진 협업을 기대합니다 ! ")
+                        .setEphemeral(true).queue();
+
                 break;
 
             case "질문하기":
@@ -79,6 +92,16 @@ public class DiscordListener extends ListenerAdapter {
                 // 발생할 예외에 대한 처리 & 객체 조회
                 goormthon.team28.startup_valley.domain.Member sender = getMember(event, event.getMember().getUser().getName());
                 goormthon.team28.startup_valley.domain.Member receiver = getMember(event, discordReceiver.getName());
+
+                // 파트 선택을 안 한 경우에 예외처리
+                if (sender.getPart() == null){
+                    event.reply(event.getMember().getAsMention() +"님이 역할을 아직 입력하지 않으셨어요 ㅠㅠ 역할 입력 해주세요 ~ !").setEphemeral(true).queue();
+                    return ;
+                }
+                if (receiver.getPart() == null){
+                    event.reply(discordReceiver.getAsMention() +"님이 역할을 아직 입력하지 않으셨어요 ㅠㅠ 역할 입력 해주세요 ~ !").setEphemeral(true).queue();
+                    return ;
+                }
 
                 // 질문 생성
                 Question question = questionService.saveQuestion(sender, receiver, questionContent, nowLocalDateTime);
@@ -108,8 +131,13 @@ public class DiscordListener extends ListenerAdapter {
                 }
                 // 실제 질문 객체 조회
                 Question findQuestion = optionalQuestion.get();
+                goormthon.team28.startup_valley.domain.Member speaker = getMember(event, event.getUser().getName());
+                if (speaker.getPart() == null){
+                    event.reply(event.getMember().getAsMention() +"님이 역할을 아직 입력하지 않으셨어요 ㅠㅠ 역할 입력 해주세요 ~ !").setEphemeral(true).queue();
+                    return ;
+                }
 
-                answerService.saveAnswer(findQuestion, getMember(event, event.getUser().getName()), answerContent, nowLocalDateTime);
+                answerService.saveAnswer(findQuestion, speaker, answerContent, nowLocalDateTime);
                 questionService.updateQuestionStatus(findQuestion, EQuestionStatus.FINISH);
 
                 event.reply("답변이 등록 되었습니다 ! ").setEphemeral(true).queue();
@@ -124,6 +152,10 @@ public class DiscordListener extends ListenerAdapter {
                 // 팀, 사용자 조회 -> 팀 멤버 조회
                 Team team = myTeam(event);
                 goormthon.team28.startup_valley.domain.Member member = getMember(event, event.getUser().getName());
+                if (member.getPart() == null){
+                    event.reply(event.getMember().getAsMention() +"님이 역할을 아직 입력하지 않으셨어요 ㅠㅠ 역할 입력 해주세요 ~ !").setEphemeral(true).queue();
+                    return ;
+                }
 
                 // 스크럼 생성 또는 조회
                 Scrum scrum = scrumService.saveOrGetScrum(member, nowLocalDate);
@@ -156,9 +188,13 @@ public class DiscordListener extends ListenerAdapter {
                 workService.updateWorkAfterOver(nowWork.getId(), workList, nowLocalDateTime);
                 Work myWork = workService.findById(nowWork.getId());
 
-                // 오늘의 업무 작업 시간 계산
+                // 오늘의 업무 작업 시간 계산 && 파트 예외 처리
                 long todayWork = Duration.between(myWork.getStartAt(), myWork.getEndAt()).toMinutes();
                 goormthon.team28.startup_valley.domain.Member worker = getMember(event, event.getUser().getName());
+                if (worker.getPart() == null){
+                    event.reply(event.getMember().getAsMention() +"님이 역할을 아직 입력하지 않으셨어요 ㅠㅠ 역할 입력 해주세요 ~ !").setEphemeral(true).queue();
+                    return ;
+                }
                 Long totalTime = worker.getTotalMinute() + todayWork;
 
                 // 업무 시간 DB 반영
@@ -213,8 +249,13 @@ public class DiscordListener extends ListenerAdapter {
 
             case "프로젝트종료":
                 Team project = myTeam(event);
+                goormthon.team28.startup_valley.domain.Member m = getMember(event, event.getUser().getName());
+                if (m.getPart() == null){
+                    event.reply(event.getMember().getAsMention() +"님이 역할을 아직 입력하지 않으셨어요 ㅠㅠ 역할 입력 해주세요 ~ !").setEphemeral(true).queue();
+                    return ;
+                }
                 // 리더가 아닌 경우
-                if (!project.getLeader().getId().equals(getMember(event, event.getUser().getName()).getId())){
+                if (!project.getLeader().getId().equals(m.getId())){
                     event.reply("프로젝트의 리더가 프로젝트의 상태를 변경할 수 있어요 ! \n\n" +
                                     event.getMember().getAsMention() + "님은 프로젝트의 리더가 아닙니다..ㅠㅠ")
                             .setEphemeral(true).queue();
@@ -278,14 +319,14 @@ public class DiscordListener extends ListenerAdapter {
         return optionalUser.get();
     }
     private goormthon.team28.startup_valley.domain.Member getMember(SlashCommandInteractionEvent event, String userId){
-        Optional<goormthon.team28.startup_valley.domain.Member> findMember = memberService.findByTeamAndUser(
+        Optional<goormthon.team28.startup_valley.domain.Member> optionalMember = memberService.findByTeamAndUser(
                 myTeam(event),
                 getUser(event, userId)
         );
-        if (findMember.isEmpty()){
+        if (optionalMember.isEmpty()){
             event.reply("팀원을 조회할 수 없습니다 ㅠㅠ. 팀원 업데이트를 통해 변경 사항을 적용해주세요 ~ !").setEphemeral(true).queue();
         }
-        return findMember.get();
+        return optionalMember.get();
     }
     private Optional<Scrum> getProcessingScrum(SlashCommandInteractionEvent event, String userId){
         Optional<Scrum> nowScrum = scrumService.findNowScrum(getMember(event, userId));
