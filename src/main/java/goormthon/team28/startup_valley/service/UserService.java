@@ -10,6 +10,7 @@ import goormthon.team28.startup_valley.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -37,6 +38,7 @@ public class UserService {
         );
     }
 
+    @Transactional
     public Boolean patchUser(Long userId, UserPatchDto userPatchDto) {
 
         User currentUser = userRepository.findById(userId)
