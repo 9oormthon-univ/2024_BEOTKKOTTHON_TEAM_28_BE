@@ -46,6 +46,8 @@ public class StartupValleyApplication {
 
 		jda.updateCommands().addCommands(
 				Commands.slash("팀원업데이트", "웹에 사용자들과 현재 진행하는 프로젝트를 연동해요 ! "),
+				Commands.slash("파트입력하기", "프로젝트에서 맡은 본인의 역할을 입력해 주세요 !")
+								.addOption(OptionType.STRING, "part", "본인의 역할을 'BACKEND', 'FRONTEND', 'FULLSTACK', 'PM', 'DESIGN' 중에서 입력해주세요 !", true),
 				Commands.slash("질문하기", "궁금한 점을 질문해봐요 ! ")
 						.addOption(OptionType.USER, "receiver", "질문 받을 사람을 선택해주세요 !", true)
 						.addOption(OptionType.STRING, "question_content", "질문 내용을 작성해주세요 !", true),

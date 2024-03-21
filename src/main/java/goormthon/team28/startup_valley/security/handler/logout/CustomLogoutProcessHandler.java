@@ -17,7 +17,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class CustomLogoutProcessHandler implements LogoutHandler {
     private final UserRepository userRepository;
     @Override
-    @Transactional
+
+  @Transactional
     public void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
         if (authentication == null){
             throw new CommonException(ErrorCode.INVALID_TOKEN_ERROR);

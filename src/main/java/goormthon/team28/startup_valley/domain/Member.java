@@ -46,4 +46,8 @@ public class Member {
     public void toggleIsPublic() {
         this.isPublic = this.isPublic ? Boolean.FALSE : Boolean.TRUE;
     }
+
+    public void updateRetrospection(String retrospection) {
+        this.retrospection = retrospection;
+    }
 }

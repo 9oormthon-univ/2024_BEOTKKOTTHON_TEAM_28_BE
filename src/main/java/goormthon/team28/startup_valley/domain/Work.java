@@ -31,6 +31,7 @@ public class Work {
     private LocalDateTime startAt;
     @Column(name = "end_at")
     private LocalDateTime endAt;
+  
     @Builder
     public Work(Scrum scrum, Member owner, LocalDateTime startAt) {
         this.scrum = scrum;

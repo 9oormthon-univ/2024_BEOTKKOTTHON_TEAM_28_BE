@@ -27,6 +27,4 @@ public enum EProfileImage {
                 .findFirst()
                 .orElseThrow(() -> new CommonException(ErrorCode.INVALID_USER_PROFILE_IMAGE_ENUM));
     }
-
-
 }

@@ -45,6 +45,5 @@ public class AuthenticationResponse {
         body.put("error", ExceptionDto.of(errorCode));
 
         response.getWriter().write(JSONValue.toJSONString(body));
-
     }
 }

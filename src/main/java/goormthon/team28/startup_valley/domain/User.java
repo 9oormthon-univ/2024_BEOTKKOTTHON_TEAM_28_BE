@@ -40,6 +40,7 @@ public class User {
     private EProfileImage profileImage;
     @Column(name = "refresh_Token")
     private String refreshToken;
+  
     @Builder
     public User(String serialId, String password, ERole role, String nickname, EProfileImage profileImage) {
         this.serialId = serialId;

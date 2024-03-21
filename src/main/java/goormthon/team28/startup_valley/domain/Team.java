@@ -34,6 +34,7 @@ public class Team {
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
     private EProjectStatus status;
+  
     @Builder
     public Team(String guildId, String name, String teamImage, LocalDate startAt, EProjectStatus status) {
         this.guildId = guildId;
