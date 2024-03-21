@@ -8,6 +8,7 @@ import goormthon.team28.startup_valley.dto.response.MemberContributionDto;
 import goormthon.team28.startup_valley.dto.response.MemberDto;
 import goormthon.team28.startup_valley.dto.response.MemberListDto;
 import goormthon.team28.startup_valley.dto.response.ScrumContributionDto;
+import goormthon.team28.startup_valley.dto.type.EPart;
 import goormthon.team28.startup_valley.exception.CommonException;
 import goormthon.team28.startup_valley.exception.ErrorCode;
 import goormthon.team28.startup_valley.repository.MemberRepository;
@@ -70,6 +71,10 @@ public class MemberService {
     @Transactional
     public void updateTotalWorkTime(Long memberId, Long totalTime){
         memberRepository.updateTotalMinute(memberId, totalTime);
+    }
+    @Transactional
+    public void updatePart(Long memberId, EPart part){
+        memberRepository.updatePart(memberId, part);
     }
 
     @Transactional
