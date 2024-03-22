@@ -1,6 +1,5 @@
 package goormthon.team28.startup_valley;
 
-import goormthon.team28.startup_valley.discord.util.DiscordUtil;
 import goormthon.team28.startup_valley.discord.info.DiscordBotToken;
 import goormthon.team28.startup_valley.discord.listener.DiscordListener;
 import goormthon.team28.startup_valley.service.*;
@@ -34,14 +33,14 @@ public class StartupValleyApplication {
 				.setMemberCachePolicy(MemberCachePolicy.ALL)
 				.setActivity(Activity.playing("START UP VALLEY"))
 				.addEventListeners(new DiscordListener(
+						context.getBean(UserService.class),
 						context.getBean(TeamService.class),
 						context.getBean(MemberService.class),
 						context.getBean(QuestionService.class),
 						context.getBean(AnswerService.class),
 						context.getBean(ScrumService.class),
 						context.getBean(WorkService.class),
-						context.getBean(GptService.class),
-						context.getBean(DiscordUtil.class)
+						context.getBean(GptService.class)
 						)
 				)
 				.build();
