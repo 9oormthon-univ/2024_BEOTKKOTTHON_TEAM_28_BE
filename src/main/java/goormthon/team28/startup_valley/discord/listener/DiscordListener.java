@@ -349,5 +349,4 @@ public class DiscordListener extends ListenerAdapter {
     public boolean isGuildOwner(Member discordMember, SlashCommandInteractionEvent event) {
         return discordMember.getUser().getName().equals(event.getGuild().getOwner().getUser().getName());
     }
-
 }
