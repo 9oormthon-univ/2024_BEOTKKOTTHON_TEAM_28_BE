@@ -34,14 +34,14 @@ public class StartupValleyApplication {
 				.setMemberCachePolicy(MemberCachePolicy.ALL)
 				.setActivity(Activity.playing("START UP VALLEY"))
 				.addEventListeners(new DiscordListener(
+						context.getBean(UserService.class),
 						context.getBean(TeamService.class),
 						context.getBean(MemberService.class),
 						context.getBean(QuestionService.class),
 						context.getBean(AnswerService.class),
 						context.getBean(ScrumService.class),
 						context.getBean(WorkService.class),
-						context.getBean(GptService.class),
-						context.getBean(DiscordUtil.class)
+						context.getBean(GptService.class)
 						)
 				)
 				.build();
