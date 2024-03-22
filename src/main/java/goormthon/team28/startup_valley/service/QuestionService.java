@@ -76,8 +76,12 @@ public class QuestionService {
         return QuestionListDto.of(questionDtoList, questionDtoList.size());
     }
 
-    public QuestionRetrieveSetListDto listReceivedQuestion(Long userId, Long teamsId, Boolean isReceived) {
-
+    public QuestionRetrieveSetListDto listReceivedQuestion(
+            Long userId,
+            Long teamsId,
+            Boolean isReceived,
+            String sort
+    ) {
         User currentUser = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
         Team team = teamRepository.findById(teamsId)
@@ -85,8 +89,18 @@ public class QuestionService {
         Member member = memberRepository.findByTeamAndUser(team, currentUser)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_MEMBER));
 
-        List<Question> questionList = isReceived ? questionRepository .findAllByReceiver(member)
-                                                 : questionRepository.findAllBySender(member);
+        List<Question> questionList;
+        switch (sort) {
+            case "all" -> questionList = isReceived ? questionRepository.findAllByReceiver(member)
+                    : questionRepository.findAllBySender(member);
+            case "completed" -> questionList = isReceived ?
+                    questionRepository.findAllByReceiverAndStatus(member, EQuestionStatus.FINISH) :
+                    questionRepository.findAllBySenderAndStatus(member, EQuestionStatus.FINISH);
+            case "pending" -> questionList = isReceived ?
+                    questionRepository.findAllByReceiverAndStatus(member, EQuestionStatus.WAITING_ANSWER) :
+                    questionRepository.findAllBySenderAndStatus(member, EQuestionStatus.WAITING_ANSWER);
+            default -> throw new CommonException(ErrorCode.INVALID_QUERY_PARAMETER);
+        }
         List<QuestionRetrieveSetDto> questionRetrieveSetDtoList = new ArrayList<>();
         for (Question question : questionList) {
             Optional<Answer> answer = answerRepository.findByQuestion(question);
