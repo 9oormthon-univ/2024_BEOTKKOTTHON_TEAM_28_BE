@@ -1,5 +1,6 @@
 package goormthon.team28.startup_valley.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import goormthon.team28.startup_valley.domain.Member;
 import goormthon.team28.startup_valley.domain.Review;
 import goormthon.team28.startup_valley.domain.Team;
@@ -29,6 +30,7 @@ public class ReviewService {
     private final UserRepository userRepository;
     private final MemberRepository memberRepository;
     private final TeamRepository teamRepository;
+    private final GptService gptService;
 
     public PeerReviewListDto listPeerReview(Long userId, Long teamsId) {
 
@@ -47,7 +49,7 @@ public class ReviewService {
                         member.getUser().getNickname(),
                         member.getUser().getProfileImage(),
                         member.getPart(),
-                        reviewRepository.findBySender(currentMember)
+                        reviewRepository.findBySenderAndReceiver(currentMember, member)
                                 .map(Review::getContent)
                                 .orElse(null)
                 ))
@@ -86,8 +88,24 @@ public class ReviewService {
                               .build();
         reviewRepository.save(review);
 
-        // 추후에 GPT API 추가
+        List<Member> teamMemberList = memberRepository.findAllByTeam(team);
+        List<Review> reviewList = reviewRepository.findAllByReceiver(targetMember);
+        // 자신을 제외한 모든 팀원들에게 동료 평가를 받은 경우
+        if (teamMemberList.size() == reviewList.size() + 1) {
+            List<String> reviewStringList = reviewList.stream()
+                    .map(Review::getContent)
+                    .toList();
+            String peerReviewSummary = null;
+            try {
+                 peerReviewSummary = gptService.sendMessage(reviewStringList, false);
+            } catch (JsonProcessingException e) {
+                throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR);
+            } finally {
+                targetMember.updatePeerReviewSummary(peerReviewSummary);
+            }
+        }
 
         return Boolean.TRUE;
     }
+
 }
