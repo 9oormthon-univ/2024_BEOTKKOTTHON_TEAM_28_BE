@@ -73,7 +73,7 @@ public class WorkService {
                             member.getPart(),
                             member.getUser().getProfileImage(),
                             work.getContent(),
-                            work.getEndAt()
+                            work.getStartAt()
                     ))
                     .toList());
         }
