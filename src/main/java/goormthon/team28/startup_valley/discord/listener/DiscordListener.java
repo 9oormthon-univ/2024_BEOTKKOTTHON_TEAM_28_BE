@@ -53,20 +53,9 @@ public class DiscordListener extends ListenerAdapter {
                     log.info("팀 생성 완료");
 
                     // 팀의 멤버를 생성하거나 조회한다.
-                    discordMembers.forEach(
-                            discordMember -> {
-                                goormthon.team28.startup_valley.domain.Member teamMember = memberService.saveOrGetMember(
-                                        team,
-                                        getUser(event, discordMember.getUser().getName())
-                                );
-                                //  처음 팀을 생성한 경우 -> 팀의 리더를 디스코드 서버의 주인으로 지정
-                                if (team.getLeader() == null &&
-                                        teamMember.getUser().getSerialId().equals(event.getGuild().getOwner().getUser().getName())){
-                                    teamService.updateLeader(team.getId(), teamMember);
-                                }
-                            }
-                    );
+                    discordMembers.forEach(discordMember -> saveOrGetMember(team, discordMember, event));
                     log.info("멤버 생성 완료");
+
                     event.reply("팀 과 팀 멤버를 연결했어요! '파트입력하기' 명령어를 통해 역할을 알려주세요 !!").setEphemeral(true).queue();
                 } else {
                     event.reply("웹에 회원가입이 필요합니다!\n\n" + "회원가입 해주세요 !! : " + noSignUp.toString()).setEphemeral(true).queue();
@@ -170,7 +159,7 @@ public class DiscordListener extends ListenerAdapter {
                 Work work = workService.saveWork(scrum, member, nowLocalDateTime);
 
                 event.reply(event.getMember().getAsMention() + "의 오늘의 업무가 등록 되었습니다 ! \n\n" +
-                        "오늘의 업무 시작 시간: " + nowLocalDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")))
+                                "오늘의 업무 시작 시간: " + nowLocalDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")))
                         .setEphemeral(true).queue();
                 break;
 
@@ -204,9 +193,9 @@ public class DiscordListener extends ListenerAdapter {
 
                 List<String> works = Arrays.stream(workList.split("; ")).toList();
                 event.reply("고생하셨습니다 ~ ! \n\n" +
-                        "오늘의 업무는: " + works.toString() + " 입니다 !\n\n" +
-                        "오늘의 업무 종료 시간은: " + nowLocalDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")) + "입니다 !\n\n" +
-                        "오늘의 업무는 " + todayWork/60 + " 시간 " + todayWork%60 + " 분 입니다 !!")
+                                "오늘의 업무는: " + works.toString() + " 입니다 !\n\n" +
+                                "오늘의 업무 종료 시간은: " + nowLocalDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")) + "입니다 !\n\n" +
+                                "오늘의 업무는 " + todayWork/60 + " 시간 " + todayWork%60 + " 분 입니다 !!")
                         .setEphemeral(true).queue();
                 break;
 
@@ -237,7 +226,7 @@ public class DiscordListener extends ListenerAdapter {
                         .toList();
                 log.info("스크럼 하위 작업들 조회 성공");
                 try {
-                    String summary = gptService.sendMessage(worksOfUser);
+                    String summary = gptService.sendMessage(worksOfUser, true);
                     log.info("summary: {}", summary);
                     scrumService.updateScrum(nowScrum.getId(), summary, nowLocalDate);
                 } catch (JsonProcessingException e) {
@@ -342,4 +331,22 @@ public class DiscordListener extends ListenerAdapter {
         return workService.findNotOverWork(getProcessingScrum(event, userId).get(), getMember(event, userId));
     }
 
+    public void saveOrGetMember(Team team, Member discordMember, SlashCommandInteractionEvent event) {
+        goormthon.team28.startup_valley.domain.Member teamMember = memberService.saveOrGetMember(
+                team,
+                getUser(event, discordMember.getUser().getName())
+        );
+
+        if (isTeamLeaderNotSet(team) && isGuildOwner(discordMember, event)) {
+            teamService.updateLeader(team.getId(), teamMember);
+        }
+    }
+
+    public boolean isTeamLeaderNotSet(Team team) {
+        return team.getLeader() == null;
+    }
+
+    public boolean isGuildOwner(Member discordMember, SlashCommandInteractionEvent event) {
+        return discordMember.getUser().getName().equals(event.getGuild().getOwner().getUser().getName());
+    }
 }

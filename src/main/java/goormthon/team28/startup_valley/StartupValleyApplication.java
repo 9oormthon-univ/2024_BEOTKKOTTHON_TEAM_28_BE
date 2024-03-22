@@ -2,10 +2,8 @@ package goormthon.team28.startup_valley;
 
 import goormthon.team28.startup_valley.discord.info.DiscordBotToken;
 import goormthon.team28.startup_valley.discord.listener.DiscordListener;
-import goormthon.team28.startup_valley.repository.MemberRepository;
-import goormthon.team28.startup_valley.repository.TeamRepository;
-import goormthon.team28.startup_valley.repository.UserRepository;
 import goormthon.team28.startup_valley.service.*;
+import jakarta.annotation.PostConstruct;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;
@@ -18,11 +16,14 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
 
-import java.util.Collections;
+import java.util.TimeZone;
 
 @SpringBootApplication
 public class StartupValleyApplication {
-
+	@PostConstruct
+	public void init() {
+		TimeZone.setDefault(TimeZone.getTimeZone("Asia/Seoul"));
+	}
 	public static void main(String[] args) {
 		ApplicationContext context = SpringApplication.run(StartupValleyApplication.class, args);
 
