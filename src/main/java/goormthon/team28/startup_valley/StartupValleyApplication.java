@@ -1,6 +1,5 @@
 package goormthon.team28.startup_valley;
 
-import goormthon.team28.startup_valley.discord.util.DiscordUtil;
 import goormthon.team28.startup_valley.discord.info.DiscordBotToken;
 import goormthon.team28.startup_valley.discord.listener.DiscordListener;
 import goormthon.team28.startup_valley.service.*;
