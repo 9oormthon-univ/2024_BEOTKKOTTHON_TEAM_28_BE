@@ -64,7 +64,8 @@ public class ScrumService {
 
         List<ScrumDto> scrumDtoList = new ArrayList<>();
         for (Member tempMember : memberList) {
-            List<Scrum> scrumList = scrumRepository.findAllByWorkerOrderByEndAtDesc(tempMember);
+            List<Scrum> scrumList = scrumRepository
+                    .findAllByWorkerAndStatusOrderByEndAtDesc(tempMember, EScrumStatus.FINISH);
             scrumDtoList.addAll(
                     scrumList.stream()
                             .map(scrum -> ScrumDto.of(
