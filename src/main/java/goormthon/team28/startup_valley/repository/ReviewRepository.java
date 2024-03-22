@@ -13,4 +13,5 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     Optional<Review> findBySenderAndReceiver(Member sender, Member receiver);
     List<Review> findAllByReceiver(Member receiver);
     Boolean existsBySender(Member sender);
+    Boolean existsBySenderAndReceiver(Member sender, Member receiver);
 }

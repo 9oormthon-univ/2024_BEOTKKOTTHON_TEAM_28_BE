@@ -28,4 +28,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     @Modifying(clearAutomatically = true)
     @Query("update Member m set m.part = :part where m.id = :memberId")
     void updatePart(Long memberId, EPart part);
+    @Modifying(clearAutomatically = true)
+    @Query("update Member m set m.peerReviewSummary = :summary where m.id = :memberId")
+    void updateReviewSummary(Long memberId, String summary);
 }

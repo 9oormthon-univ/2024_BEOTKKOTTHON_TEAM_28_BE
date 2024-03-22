@@ -31,6 +31,16 @@ public class ReviewService {
     private final MemberRepository memberRepository;
     private final TeamRepository teamRepository;
     private final GptService gptService;
+    @Transactional
+    public void saveReview(Team team, Member sender, Member receiver, String content){
+        reviewRepository.save(Review.builder()
+                .team(team)
+                .sender(sender)
+                .receiver(receiver)
+                .content(content)
+                .build()
+        );
+    }
 
     public PeerReviewListDto listPeerReview(Long userId, Long teamsId) {
 
@@ -107,5 +117,10 @@ public class ReviewService {
 
         return Boolean.TRUE;
     }
-
+    public boolean isAlreadyExistReview(Member sender, Member receiver){
+        return reviewRepository.existsBySenderAndReceiver(sender, receiver);
+    }
+    public List<Review> findAllByReceiver(Member receiver){
+        return reviewRepository.findAllByReceiver(receiver);
+    }
 }
