@@ -3,6 +3,7 @@ package goormthon.team28.startup_valley.service;
 import goormthon.team28.startup_valley.domain.*;
 import goormthon.team28.startup_valley.dto.request.WorkTimeDto;
 import goormthon.team28.startup_valley.dto.response.*;
+import goormthon.team28.startup_valley.dto.type.EPart;
 import goormthon.team28.startup_valley.exception.CommonException;
 import goormthon.team28.startup_valley.exception.ErrorCode;
 import goormthon.team28.startup_valley.repository.*;
@@ -51,7 +52,7 @@ public class WorkService {
         return workRepository.findByScrumAndOwnerAndEndAtIsNull(scrum, member);
     }
 
-    public WorkListDto listMemberWork(Long userId, Long teamsId) {
+    public WorkListDto listMemberWork(Long userId, Long teamsId, String sort) {
 
         User currentUser = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
@@ -62,7 +63,16 @@ public class WorkService {
         if (!memberRepository.existsByUserAndTeam(currentUser, team))
             throw new CommonException(ErrorCode.NOT_FOUND_MEMBER);
 
-        List<Member> memberList = memberRepository.findAllByTeam(team);
+        List<Member> memberList;
+        switch (sort) {
+            case "all" -> memberList = memberRepository.findAllByTeam(team);
+            case "front" -> memberList = memberRepository.findAllByTeamAndPart(team, EPart.FRONTEND);
+            case "back" -> memberList = memberRepository.findAllByTeamAndPart(team, EPart.BACKEND);
+            case "pm" -> memberList = memberRepository.findAllByTeamAndPart(team, EPart.PM);
+            case "design" -> memberList = memberRepository.findAllByTeamAndPart(team, EPart.DESIGN);
+            default -> throw new CommonException(ErrorCode.INVALID_QUERY_PARAMETER);
+        }
+
         List<WorkDto> workDtoList = new ArrayList<>();
         for (Member member : memberList) {
             List<Work> workList = workRepository.findAllByOwner(member);
