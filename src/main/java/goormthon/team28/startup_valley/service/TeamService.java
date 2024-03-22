@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 @Slf4j
 @Service
@@ -94,12 +95,26 @@ public class TeamService {
         );
     }
 
-    public TeamRetrieveListDto listProgressingTeam(Long userId) {
+    public TeamRetrieveListDto listRetrieveTeam(Long userId, Long membersId, String sort) {
 
-        User currentUser = userRepository.findById(userId)
-                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
-        List<Member> memberList = memberRepository.findAllByUser(currentUser);
-        List<TeamRetrieveDto> teamRetrieveDtoList = memberList.stream()
+        Member targetMember = memberRepository.findById(membersId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_MEMBER));
+        User targetUser = targetMember.getUser();
+        List<Member> memberList = memberRepository.findAllByUser(targetUser);
+
+        Stream<Member> memberStream;
+        switch (sort) {
+            case "all" -> memberStream = memberList.stream();
+            case "complete" -> memberStream = memberList.stream()
+                    .filter(member -> member.getTeam().getStatus().equals(EProjectStatus.FINISH));
+            case "progress" -> memberStream = memberList.stream()
+                    .filter(member -> member.getTeam().getStatus().equals(EProjectStatus.IN_PROGRESS));
+            case "peer" -> memberStream = memberList.stream()
+                    .filter(member -> member.getTeam().getStatus().equals(EProjectStatus.PEER_REVIEW));
+            default -> throw new CommonException(ErrorCode.INVALID_QUERY_PARAMETER);
+        }
+
+        List<TeamRetrieveDto> teamRetrieveDtoList = memberStream
                 .map(member -> TeamRetrieveDto.of(
                         member.getTeam().getId(),
                         member.getTeam().getName(),

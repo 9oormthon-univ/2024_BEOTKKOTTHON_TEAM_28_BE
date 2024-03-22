@@ -17,6 +17,7 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
     @EntityGraph(attributePaths = {"sender"})
     Optional<Question> findByCodeAndStatus(String code, EQuestionStatus status);
     List<Question> findAllByReceiverAndStatus(Member member, EQuestionStatus eQuestionStatus);
+    List<Question> findAllBySenderAndStatus(Member member, EQuestionStatus eQuestionStatus);
     List<Question> findAllByReceiver(Member member);
     List<Question> findAllBySender(Member member);
     boolean existsByCode(String code);

@@ -15,8 +15,12 @@ public class WorkController {
     private final WorkService workService;
 
     @GetMapping("/teams/{teamsId}/works")
-    public ResponseDto<?> listMemberWork(@UserId Long userId, @PathVariable Long teamsId) {
-        return ResponseDto.ok(workService.listMemberWork(userId, teamsId));
+    public ResponseDto<?> listMemberWork(
+            @UserId Long userId,
+            @PathVariable Long teamsId,
+            @RequestParam String sort
+    ) {
+        return ResponseDto.ok(workService.listMemberWork(userId, teamsId, sort));
     }
 
     @GetMapping("/teams/{teamsId}/works/ranking")
