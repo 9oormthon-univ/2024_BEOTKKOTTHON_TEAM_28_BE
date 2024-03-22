@@ -1,11 +1,9 @@
 package goormthon.team28.startup_valley.discord.listener;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import goormthon.team28.startup_valley.domain.Question;
-import goormthon.team28.startup_valley.domain.Scrum;
-import goormthon.team28.startup_valley.domain.Team;
-import goormthon.team28.startup_valley.domain.Work;
+import goormthon.team28.startup_valley.domain.*;
 import goormthon.team28.startup_valley.dto.type.EPart;
+import goormthon.team28.startup_valley.dto.type.EProjectStatus;
 import goormthon.team28.startup_valley.dto.type.EQuestionStatus;
 import goormthon.team28.startup_valley.service.*;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +32,7 @@ public class DiscordListener extends ListenerAdapter {
     private final ScrumService scrumService;
     private final WorkService workService;
     private final GptService gptService;
+    private final ReviewService reviewService;
     @Override
     @Transactional
     public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
@@ -230,7 +229,7 @@ public class DiscordListener extends ListenerAdapter {
                     log.info("summary: {}", summary);
                     scrumService.updateScrum(nowScrum.getId(), summary, nowLocalDate);
                 } catch (JsonProcessingException e) {
-                    event.reply("gpt 요약 기능에서 문제가 생겼어요.. ㅠㅠ 금방 고칠게요 !!")
+                    event.reply("gpt 요약 기능에서 문제가 생겼어요.. ㅠㅠ 잠시후 시도해 주세요..!")
                             .setEphemeral(true).queue();
                     return ;
                 }
@@ -275,6 +274,52 @@ public class DiscordListener extends ListenerAdapter {
                 }
                 teamService.updateInformation(myTeam.getId(), newName, newImage);
                 event.reply("서버의 정보가 변경되었습니다 ! 웹으로 확인해주세요 ~").setEphemeral(true).queue();
+                break;
+
+            case "동료평가작성":
+                Team targetTeam = myTeam(event);
+                // 프로젝트 팀의 단계가 동료평가 단계인지
+                if (!targetTeam.getStatus().equals(EProjectStatus.PEER_REVIEW)){
+                    event.reply("동료평가는 /프로젝트종료 커멘드 이후에 작업할 수 있어요 !! 프로젝트의 상태를 변경해주세요 !!").setEphemeral(true).queue();
+                    return ;
+                }
+                goormthon.team28.startup_valley.domain.Member sendMember = getMember(event, event.getUser().getName());
+                goormthon.team28.startup_valley.domain.Member receiveMember = getMember(event, event.getOption("receiver").getAsUser().getName());
+
+                // 이미 작성한 사람인지 -> 보낸,받는 동일
+                if (reviewService.isAlreadyExistReview(sendMember, receiveMember)){
+                    event.reply("이미 동료평가를 작성한 팀원입니다 ! 다른 분의 동료평가를 작성해주세요 !").setEphemeral(true).queue();
+                    return ;
+                }
+
+                // 동료평가 작성
+                reviewService.saveReview(targetTeam, sendMember, receiveMember, event.getOption("evaluate").getAsString());
+                log.info("동료평가 작성 완료");
+
+                // 받은 사람을 기준으로 개수 파악 -> 팀 멤버 - 1 -> gpt로 요약 ㄱㄱ
+                List<Review> findReviews = reviewService.findAllByReceiver(receiveMember);
+                List<Member> discordPeople = event.getGuild().getMembers();
+
+                // 모두가 동료평가를 작성한 경우 -> gpt 요약 필요
+                if (findReviews.size() == discordPeople.size() - 2) {// 봇과 자기 자신
+                    List<String> reviews = findReviews.stream()
+                            .map(review -> review.getContent())
+                            .toList();
+                    try {
+                        String summaryOfReviews = gptService.sendMessage(reviews, false);
+                        log.info("동료평가 요약 성공: {}", summaryOfReviews);
+                        memberService.updateReviewSummary(receiveMember.getId(), summaryOfReviews);
+                        event.reply(event.getOption("receiver").getAsMentionable().getAsMention()
+                                + "님의 동료평가가 모두 종료 되었습니다 !!")
+                                .setEphemeral(true).queue();
+                        return ;
+                    } catch (JsonProcessingException e) {
+                        event.reply("gpt 요약 기능에서 문제가 생겼어요.. ㅠㅠ 잠시후 시도해 주세요..!").setEphemeral(true).queue();
+                        return ;
+                    }
+                } else { // 그렇지 않은 경우
+                    event.reply("동료평가 작성이 완료 되었습니다 !, 다른 동료평가도 진행해주세요 ~ !").setEphemeral(true).queue();
+                }
                 break;
         }
     }

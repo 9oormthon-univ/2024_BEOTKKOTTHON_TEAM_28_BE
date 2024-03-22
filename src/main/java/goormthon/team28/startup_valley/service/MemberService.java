@@ -78,6 +78,11 @@ public class MemberService {
     public void updatePart(Long memberId, EPart part){
         memberRepository.updatePart(memberId, part);
     }
+
+    @Transactional
+    public void updateReviewSummary(Long memberId, String summary){
+        memberRepository.updateReviewSummary(memberId, summary);
+    }
     @Transactional
     public Boolean toggleTeamPublic(Long userId, Long membersId) {
 
