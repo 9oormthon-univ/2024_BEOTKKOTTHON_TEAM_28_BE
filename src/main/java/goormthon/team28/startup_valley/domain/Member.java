@@ -50,4 +50,7 @@ public class Member {
     public void updateRetrospection(String retrospection) {
         this.retrospection = retrospection;
     }
+    public void updatePeerReviewSummary(String peerReviewSummary) {
+        this.peerReviewSummary = peerReviewSummary;
+    }
 }
