@@ -20,13 +20,21 @@ public class QuestionController {
     }
 
     @GetMapping("/teams/{teamsId}/questions/received")
-    public ResponseDto<?> listReceivedQuestion(@UserId Long userId, @PathVariable Long teamsId) {
-        return ResponseDto.ok(questionService.listReceivedQuestion(userId, teamsId, Boolean.TRUE));
+    public ResponseDto<?> listReceivedQuestion(
+            @UserId Long userId,
+            @PathVariable Long teamsId,
+            @RequestParam String sort
+    ) {
+        return ResponseDto.ok(questionService.listReceivedQuestion(userId, teamsId, Boolean.TRUE, sort));
     }
 
     @GetMapping("/teams/{teamsId}/questions/sent")
-    public ResponseDto<?> listSentQuestion(@UserId Long userId, @PathVariable Long teamsId) {
-        return ResponseDto.ok(questionService.listReceivedQuestion(userId, teamsId, Boolean.FALSE));
+    public ResponseDto<?> listSentQuestion(
+            @UserId Long userId,
+            @PathVariable Long teamsId,
+            @RequestParam String sort
+    ) {
+        return ResponseDto.ok(questionService.listReceivedQuestion(userId, teamsId, Boolean.FALSE, sort));
     }
 
     @PostMapping("/teams/{teamsId}/questions")
