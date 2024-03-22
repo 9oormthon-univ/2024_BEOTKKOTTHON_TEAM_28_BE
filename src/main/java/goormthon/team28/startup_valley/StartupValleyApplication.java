@@ -1,11 +1,8 @@
 package goormthon.team28.startup_valley;
 
-import goormthon.team28.startup_valley.discord.DiscordUtil;
+import goormthon.team28.startup_valley.discord.util.DiscordUtil;
 import goormthon.team28.startup_valley.discord.info.DiscordBotToken;
 import goormthon.team28.startup_valley.discord.listener.DiscordListener;
-import goormthon.team28.startup_valley.repository.MemberRepository;
-import goormthon.team28.startup_valley.repository.TeamRepository;
-import goormthon.team28.startup_valley.repository.UserRepository;
 import goormthon.team28.startup_valley.service.*;
 import jakarta.annotation.PostConstruct;
 import net.dv8tion.jda.api.JDA;
@@ -20,7 +17,6 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
 
-import java.util.Collections;
 import java.util.TimeZone;
 
 @SpringBootApplication
