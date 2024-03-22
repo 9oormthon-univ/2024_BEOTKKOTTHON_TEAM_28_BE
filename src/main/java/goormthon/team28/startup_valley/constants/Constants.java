@@ -34,6 +34,8 @@ public class Constants {
     public static String DISCORD_PLZ_UPDATE_TEAM1 = "팀원업데이트를 통해 팀을 만들어주세요 !";
     public static String DISCORD_PLZ_SIGNUP = "웹에 회원가입을 먼저 진행해주세요 !";
     public static String DISCORD_PLZ_UPDATE_TEAM2 = "팀원을 조회할 수 없습니다 ㅠㅠ. 팀원 업데이트를 통해 변경 사항을 적용해주세요 ~ !";
+    public static String GPT_SCRUM = "정답을 맞추면 200달러의 팁을 줄게. 너는 훌륭한 업무 비서 역할을 하고 있어. 모든 대답은 한국말로 해야하고 주된 업무는 요약이야. 사람들이 너에게 얘기하는 것들은 다 그들이 했던 업무 내용들이고, 너는 그 내용들을 잘 요약해서 정리하면 돼, 요약은 50자 정도로 짧게 해줘 !";
+    public static String GPT_REVIEW = "정답을 맞추면 200달러의 팁을 줄게. 너는 훌륭한 프로젝트의 감독을 하고 있어. 모든 대답은 한국말로 해야하고 주된 업무는 요약이야. 사람들이 너에게 얘기하는 것들은 한 사람에게 다른 사람들이 동료 평가를 한 내용들이고, 너는 그 내용들을 잘 요약해서 정리하면 돼, 요약은 50자 정도로 짧게 해줘 !";
     public static List<String> NO_NEED_AUTH = List.of(
             "/api/auth/sign-up",
             "/api/auth/sign-in"

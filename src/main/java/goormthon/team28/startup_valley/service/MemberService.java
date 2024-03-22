@@ -10,6 +10,7 @@ import goormthon.team28.startup_valley.dto.response.MemberDto;
 import goormthon.team28.startup_valley.dto.response.MemberListDto;
 import goormthon.team28.startup_valley.dto.response.ScrumContributionDto;
 import goormthon.team28.startup_valley.dto.type.EPart;
+import goormthon.team28.startup_valley.dto.type.EScrumStatus;
 import goormthon.team28.startup_valley.exception.CommonException;
 import goormthon.team28.startup_valley.exception.ErrorCode;
 import goormthon.team28.startup_valley.repository.MemberRepository;
@@ -104,7 +105,8 @@ public class MemberService {
         // 조회하려는 멤버의 기여도가 비공개면서 조회하려는 멤버와 로그인 유저가 다른 경우 조회 불가능 처리
         if (!targetMember.getUser().equals(currentUser) && !targetMember.getIsPublic())
             throw new CommonException(ErrorCode.INVALID_CHECK_TEAM_CONTRIBUTION);
-        List<Scrum> scrumList = scrumRepository.findAllByWorkerOrderByEndAtDesc(targetMember);
+        List<Scrum> scrumList = scrumRepository
+                .findAllByWorkerAndStatusOrderByEndAtDesc(targetMember, EScrumStatus.FINISH);
         List<ScrumContributionDto> scrumContributionDtoList = scrumList.stream()
                 .map(scrum -> ScrumContributionDto.of(
                         scrum.getId(),

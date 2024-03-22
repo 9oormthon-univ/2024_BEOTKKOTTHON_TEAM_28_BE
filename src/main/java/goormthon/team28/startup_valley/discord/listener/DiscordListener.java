@@ -199,7 +199,7 @@ public class DiscordListener extends ListenerAdapter {
                         .toList();
 
                 try {
-                    String summary = gptService.sendMessage(worksOfUser);
+                    String summary = gptService.sendMessage(worksOfUser, true);
                     log.info("summary: {}", summary);
 
                     scrumService.updateScrum(nowScrum.getId(), summary, nowLocalDate);
