@@ -141,7 +141,7 @@ public class DiscordListener extends ListenerAdapter {
 
                 // 스크럼 생성 또는 조회
                 Scrum scrum = scrumService.saveOrGetScrum(member, nowLocalDate);
-                if (DiscordExceptionHandler.checkExisted(Optional.ofNullable(discordUtil.getMyProcessingWork(event)), event, Constants.DISCORD_REGISTER_SCRUM_FAIL))
+                if (!DiscordExceptionHandler.checkEmpty(Optional.ofNullable(discordUtil.getMyProcessingWork(event)), event, Constants.DISCORD_REGISTER_SCRUM_FAIL))
                     return;
 
                 // 업무 생성
@@ -188,7 +188,7 @@ public class DiscordListener extends ListenerAdapter {
 
                 // 업무가 아직 종료되지 않는 것이 있는 경우
                 Optional<Work> optionWork = discordUtil.getMyProcessingWork(event);
-                if (DiscordExceptionHandler.checkExisted(Optional.ofNullable(optionWork), event, Constants.DISCORD_PLZ_MAKE_WORK_DONE))
+                if (!DiscordExceptionHandler.checkEmpty(Optional.ofNullable(optionWork), event, Constants.DISCORD_PLZ_MAKE_WORK_DONE))
                     return;
 
                 // 스크럼 종료 대기 중 & 업무도 모두 종료 된 상태 -> 스크럼 종료가 가능한 상태

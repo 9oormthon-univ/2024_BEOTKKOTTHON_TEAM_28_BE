@@ -19,6 +19,13 @@ public class DiscordExceptionHandler {
         }
         return true;
     }
+    public static boolean checkEmpty(Optional<Object> optionalObject, SlashCommandInteractionEvent event, String chatContent){
+        if (optionalObject.isPresent()){
+            event.reply(chatContent).setEphemeral(true).queue();
+            return false;
+        }
+        return true;
+    }
     public static boolean checkSameString(String str1, String str2, SlashCommandInteractionEvent event, String chatContent){
         if (!str1.equals(str2)){
             event.reply(chatContent).setEphemeral(true).queue();
