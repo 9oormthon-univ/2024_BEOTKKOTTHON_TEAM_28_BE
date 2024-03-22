@@ -40,7 +40,8 @@ public class StartupValleyApplication {
 						context.getBean(AnswerService.class),
 						context.getBean(ScrumService.class),
 						context.getBean(WorkService.class),
-						context.getBean(GptService.class)
+						context.getBean(GptService.class),
+						context.getBean(ReviewService.class)
 						)
 				)
 				.build();
@@ -61,7 +62,10 @@ public class StartupValleyApplication {
 						.addOption(OptionType.STRING, "work_list", "오늘의 업무 내용을 '; '을 통해서 구분하여 작성해주세요 !! ", true),
 				Commands.slash("스크럼종료", "지금까지의 업무들로 하나의 스크럼을 생성해요 ! "),
 				Commands.slash("프로젝트종료", "프로젝트의 리더가 결정 할 수 있어요 !  종료하고 동료평가 단계로 넘어가요 ! "),
-				Commands.slash("서버최신화", "디스코드의 서버 이름과 이미지의 변경점을 웹에 적용해요 ! ")
+				Commands.slash("서버최신화", "디스코드의 서버 이름과 이미지의 변경점을 웹에 적용해요 ! "),
+				Commands.slash("동료평가작성", "개발이 마무리 되셨나요? 프로젝트 종료 이후에 팀원들 사이에 동료평가를 작성할 수 있습니다 !")
+						.addOption(OptionType.USER, "receiver", "동료평가를 할 사람을 지정해주세요", true)
+						.addOption(OptionType.STRING, "evaluate", "동로평가의 내용을 작성해주세요", true)
 		).queue();
 	}
 
