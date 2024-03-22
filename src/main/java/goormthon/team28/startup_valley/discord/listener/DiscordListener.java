@@ -226,7 +226,7 @@ public class DiscordListener extends ListenerAdapter {
                         .toList();
                 log.info("스크럼 하위 작업들 조회 성공");
                 try {
-                    String summary = gptService.sendMessage(worksOfUser);
+                    String summary = gptService.sendMessage(worksOfUser, true);
                     log.info("summary: {}", summary);
                     scrumService.updateScrum(nowScrum.getId(), summary, nowLocalDate);
                 } catch (JsonProcessingException e) {
