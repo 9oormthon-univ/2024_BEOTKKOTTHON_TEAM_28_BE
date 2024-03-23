@@ -376,29 +376,6 @@ public class DiscordListener extends ListenerAdapter {
                 ).setEphemeral(true).queue();
 
                 break;
-
-            case "동료평가조회":
-                Team mine = myTeam(event);
-                if (!mine.getStatus().equals(EProjectStatus.PEER_REVIEW)){
-                    event.reply("동료평가 단계가 아닙니다 ㅠㅠ. 프로젝트를 종료해주세요 !").setEphemeral(true).queue();
-                    return ;
-                }
-                goormthon.team28.startup_valley.domain.Member findSender = getMember(event, event.getOption("writer").getAsUser().getName());
-                goormthon.team28.startup_valley.domain.Member findReceiver = getMember(event, event.getOption("receiver").getAsUser().getName());
-                Optional<Review> optionalReview = reviewService.findBySenderAndReceiver(findSender, findReceiver);
-                if (optionalReview.isEmpty()){
-                    event.reply("아직 진행되지 않은 동료평가입니다 ! 동료평가를 얼른 진행해주세요 ~ !").setEphemeral(true).queue();
-                    return ;
-                }
-
-                event.reply(
-                        event.getOption("writer").getAsUser().getAsMention() + "께서 " +
-                                event.getOption("receiver").getAsUser().getAsMention() +"께 한 동료평가 입니다 ! \n\n" +
-                                "동료평가 : " + optionalReview.get().getContent()
-                ).setEphemeral(true).queue();
-
-                break;
-                // R&R 작성시 -> 프로젝트 상태 고려 해야할 듯? 그러면 그 상태는 어디에서?
         }
     }
     public List<String> findNoSignUp(List<Member> members) {
