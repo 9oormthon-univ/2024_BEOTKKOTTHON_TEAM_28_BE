@@ -14,6 +14,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,6 +24,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class AuthController {
+    @Value("{$domain.server}")
+    private String domain;
     private final AuthService authService;
     @PostMapping("/sign-up")
     public ResponseDto<?> signUp(@RequestBody AuthSignUpDto authSignUpDto){
@@ -40,8 +43,8 @@ public class AuthController {
         log.info("헤더값 조회 성공");
         JwtTokenDto jwtTokenDto = authService.reGenerateTokens(userId, refreshToken);
 
-        CookieUtil.addCookie(response, Constants.ACCESS_COOKIE_NAME, jwtTokenDto.accessToken());
-        CookieUtil.addSecureCookie(response, Constants.REFRESH_COOKIE_NAME, jwtTokenDto.refreshToken(), 60 * 60 * 24 * 14);
+        CookieUtil.addCookie(response, domain, Constants.ACCESS_COOKIE_NAME, jwtTokenDto.accessToken());
+        CookieUtil.addSecureCookie(response, domain, Constants.REFRESH_COOKIE_NAME, jwtTokenDto.refreshToken(), 60 * 60 * 24 * 14);
 
         return ResponseDto.ok(jwtTokenDto);
     }
