@@ -87,6 +87,10 @@ public class MemberService {
         memberRepository.updateReviewSummary(memberId, summary);
     }
     @Transactional
+    public void updateRetrospection(Long memberId, String retrospection){
+        memberRepository.updateRetrospection(memberId, retrospection);
+    }
+    @Transactional
     public Boolean toggleTeamPublic(Long userId, Long membersId) {
 
         User currentUser = userRepository.findById(userId)

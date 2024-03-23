@@ -74,6 +74,21 @@ public class DiscordListener extends ListenerAdapter {
 
                 break;
 
+            case "전체업무정리하기":
+                String rr = event.getOption("content").getAsString();
+
+                goormthon.team28.startup_valley.domain.Member i = getMember(event, event.getUser().getName());
+                boolean edit = i.getRetrospection() == null;
+                memberService.updateRetrospection(i.getId(), rr);
+                if (!edit){
+                    event.reply(event.getUser().getAsMention() + "님의 R&R이 수정 되었습니다 !").setEphemeral(true).queue();
+                    return ;
+                } else {
+                    event.reply(event.getUser().getAsMention() + "님의 R&R이 작성 되었습니다 !").setEphemeral(true).queue();
+                }
+
+                break;
+
             case "질문하기":
                 User discordReceiver = event.getOption("receiver").getAsUser();
                 String questionContent = event.getOption("question_content").getAsString();

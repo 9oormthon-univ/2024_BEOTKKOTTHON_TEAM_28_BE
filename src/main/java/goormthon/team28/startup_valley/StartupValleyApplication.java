@@ -68,7 +68,9 @@ public class StartupValleyApplication {
 						.addOption(OptionType.STRING, "evaluate", "동로평가의 내용을 작성해주세요", true),
 				Commands.slash("동료평가조회", "팀원들 사이의 동료평가를 조회할 수 있어요 !")
 						.addOption(OptionType.USER, "writer", "동료평가의 평가자를 선택해주세요", true)
-						.addOption(OptionType.USER, "receiver", "동료평가의 피평가자를 선택해주세요", true)
+						.addOption(OptionType.USER, "receiver", "동료평가의 피평가자를 선택해주세요", true),
+				Commands.slash("전체업무정리하기", "프로젝트의 본인의 역할에 대해서 간단히 설명해요 !")
+						.addOption(OptionType.STRING, "content", "프로젝트에서의 본인의 역할에 대해 작성해주세요", true)
 		).queue();
 	}
 
