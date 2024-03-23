@@ -51,8 +51,11 @@ public class TeamService {
         teamRepository.updateLeader(teamId, member);
     }
     @Transactional
-    public void updateStatus(Long teamId){
-        teamRepository.updateStatus(teamId, EProjectStatus.PEER_REVIEW);
+    public void updateStatus(Long teamId, EProjectStatus status){
+        teamRepository.updateStatus(teamId, status);
+        if (status.equals(EProjectStatus.FINISH)){
+            teamRepository.updateEndAt(teamId, LocalDate.now());
+        }
     }
     @Transactional
     public void updateInformation(Long teamId, String newName, String newImage){

@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.Optional;
 
 
@@ -23,4 +24,7 @@ public interface TeamRepository extends JpaRepository<Team, Long> {
     @Modifying(clearAutomatically = true)
     @Query("update Team t set t.name = :name, t.teamImage = :image where t.id = :teamId")
     void updateInformation(Long teamId, String name, String image);
+    @Modifying(clearAutomatically = true)
+    @Query("update Team t set t.endAt = :endAt where t.id = :teamId")
+    void updateEndAt(Long teamId, LocalDate endAt);
 }
