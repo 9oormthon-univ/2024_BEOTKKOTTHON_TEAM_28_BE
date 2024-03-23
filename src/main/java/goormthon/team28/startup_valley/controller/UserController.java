@@ -23,4 +23,9 @@ public class UserController {
     public ResponseDto<?> patchUser(@UserId Long userId, @RequestBody UserPatchDto userPatchDto) {
         return ResponseDto.ok(userService.patchUser(userId, userPatchDto));
     }
+
+    @GetMapping("/members/{membersId}/user-info")
+    public ResponseDto<?> getUserInfoByMembersId(@UserId Long userId, @PathVariable Long membersId) {
+        return ResponseDto.ok(userService.getUserInfoByMembersId(userId, membersId));
+    }
 }

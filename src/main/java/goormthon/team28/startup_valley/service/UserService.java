@@ -54,4 +54,17 @@ public class UserService {
 
         return Boolean.TRUE;
     }
+
+    public UserDto getUserInfoByMembersId(Long userId, Long membersId) {
+
+        Member targetMember = memberRepository.findById(membersId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_MEMBER));
+        User targetUser = targetMember.getUser();
+        return UserDto.of(
+                targetUser.getId(),
+                membersId,
+                targetUser.getNickname(),
+                targetUser.getProfileImage()
+        );
+    }
 }
