@@ -30,6 +30,7 @@ public class ScrumService {
     private final ScrumRepository scrumRepository;
     private final UserRepository userRepository;
     private final MemberRepository memberRepository;
+    private final TeamRepository teamRepository;
     private final WorkRepository workRepository;
 
     @Transactional
@@ -46,21 +47,29 @@ public class ScrumService {
         scrumRepository.updateScrumAfterOver(scrumId, summary, EScrumStatus.FINISH, now);
     }
 
-    public ScrumListDto listScrum(Long userId, Long membersId) {
+    public ScrumListDto listScrum(Long userId, Long teamsId, Long target) {
 
         User currentUser = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
-        Member paramMember = memberRepository.findById(membersId)
-                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_MEMBER));
-        Team paramTeam = paramMember.getTeam();
-        List<Member> memberList = memberRepository.findAllByTeam(paramTeam);
+        Team targetTeam = teamRepository.findById(teamsId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_TEAM));
+        if (!memberRepository.existsByUserAndTeam(currentUser, targetTeam))
+            throw new CommonException(ErrorCode.MISMATCH_LOGIN_USER_AND_TEAM);
 
-        // 로그인 한 사용자가 검색하고 싶은 대상의 팀이 아닌 경우 예외처리
-        Optional<Member> currentMemberOptional = memberList.stream()
-                .filter(member -> member.getUser().equals(currentUser))
-                .findFirst();
-        if (currentMemberOptional.isEmpty())
-                throw new CommonException(ErrorCode.MISMATCH_LOGIN_USER_AND_TEAM);
+        List<Member> memberList = new ArrayList<>();
+        Member targetMember;
+        if (target == null)
+            memberList = memberRepository.findAllByTeam(targetTeam);
+        else {
+            targetMember = memberRepository.findById(target)
+                            .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_MEMBER));
+            if (!targetMember.getTeam().equals(targetTeam))
+                throw new CommonException(ErrorCode.MISMATCH_TEAM_AND_MEMBER);
+            memberList.add(
+                    memberRepository.findById(target)
+                            .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_MEMBER))
+            );
+        }
 
         List<ScrumDto> scrumDtoList = new ArrayList<>();
         for (Member tempMember : memberList) {
