@@ -20,6 +20,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -70,6 +71,21 @@ public class DiscordListener extends ListenerAdapter {
 
                 event.reply(event.getUser().getAsMention() + " 파트 입력까지 완료 되었습니다 !, 앞으로의 멋진 협업을 기대합니다 ! ")
                         .setEphemeral(true).queue();
+
+                break;
+
+            case "전체업무정리하기":
+                String rr = event.getOption("content").getAsString();
+
+                goormthon.team28.startup_valley.domain.Member i = getMember(event, event.getUser().getName());
+                boolean edit = i.getRetrospection() == null;
+                memberService.updateRetrospection(i.getId(), rr);
+                if (!edit){
+                    event.reply(event.getUser().getAsMention() + "님의 R&R이 수정 되었습니다 !").setEphemeral(true).queue();
+                    return ;
+                } else {
+                    event.reply(event.getUser().getAsMention() + "님의 R&R이 작성 되었습니다 !").setEphemeral(true).queue();
+                }
 
                 break;
 
@@ -252,7 +268,7 @@ public class DiscordListener extends ListenerAdapter {
                     return ;
                 }
                 // 프로젝트 상태 동료 평가 단계로 변경
-                teamService.updateStatus(project.getId());
+                teamService.updateStatus(project.getId(), EProjectStatus.PEER_REVIEW);
                 event.reply("프로젝트의 상태가 변경 되었습니다 !")
                         .setEphemeral(true).queue();
                 // 팀원들에게 알림
@@ -316,20 +332,49 @@ public class DiscordListener extends ListenerAdapter {
                         String summaryOfReviews = gptService.sendMessage(reviews, false);
                         log.info("동료평가 요약 성공: {}", summaryOfReviews);
                         memberService.updateReviewSummary(receiveMember.getId(), summaryOfReviews);
-                        event.reply(event.getOption("receiver").getAsMentionable().getAsMention()
-                                + "님의 동료평가가 모두 종료 되었습니다 !!")
-                                .setEphemeral(true).queue();
-                        return ;
+                        // 동료평가를 모두 받은 사람의 목록
+                        List<goormthon.team28.startup_valley.domain.Member> members = memberService.findAllByTeam(targetTeam).stream()
+                                .filter(one -> one.getPeerReviewSummary() != null)
+                                .collect(Collectors.toList());
+
+                        // 동료평가를 끝낸 사람의 수와 서버의 사람 수와 동일 => 프로젝트 종료 가능
+                        if (members.size() == discordPeople.size()){
+                            teamService.updateStatus(targetTeam.getId(), EProjectStatus.FINISH);
+                            event.reply("동료평가 작성이 완료 되었습니다 !, 다른 동료평가도 진행해주세요 ~ !").setEphemeral(true).queue();
+                            event.getGuild().getTextChannelById(event.getChannel().getId())
+                                    .sendMessage("@everyone !! 모든 동료평가가 종료 되었습니다 !! 그동안 수고하셨습니다 ~ !")
+                                    .queue();
+                            return ;
+                        }
+                        event.reply("동료평가 작성이 완료 되었습니다 !, 다른 동료평가도 진행해주세요 ~ !").setEphemeral(true).queue();
                     } catch (JsonProcessingException e) {
                         event.reply("gpt 요약 기능에서 문제가 생겼어요.. ㅠㅠ 잠시후 시도해 주세요..!").setEphemeral(true).queue();
                         return ;
                     }
-                    /*
-                        모두의 동료평가가 끝난 경우 프로젝트 상태 변경? FINISH로?
-                     */
-                } else { // 그렇지 않은 경우
-                    event.reply("동료평가 작성이 완료 되었습니다 !, 다른 동료평가도 진행해주세요 ~ !").setEphemeral(true).queue();
                 }
+                event.reply("동료평가 작성이 완료 되었습니다 !, 다른 동료평가도 진행해주세요 ~ !").setEphemeral(true).queue();
+                break;
+
+            case "동료평가조회":
+                Team mine = myTeam(event);
+                // 동료평가 or 끝난 상황에서 동료평가 조회 가능
+                if (mine.getStatus().equals(EProjectStatus.IN_PROGRESS)){
+                    event.reply("동료평가 단계가 아닙니다 ㅠㅠ. 프로젝트를 종료해주세요 !").setEphemeral(true).queue();
+                    return ;
+                }
+                goormthon.team28.startup_valley.domain.Member findSender = getMember(event, event.getOption("writer").getAsUser().getName());
+                goormthon.team28.startup_valley.domain.Member findReceiver = getMember(event, event.getOption("receiver").getAsUser().getName());
+                Optional<Review> optionalReview = reviewService.findBySenderAndReceiver(findSender, findReceiver);
+                if (optionalReview.isEmpty()){
+                    event.reply("아직 진행되지 않은 동료평가입니다 ! 동료평가를 얼른 진행해주세요 ~ !").setEphemeral(true).queue();
+                    return ;
+                }
+                event.reply(
+                        event.getOption("writer").getAsUser().getAsMention() + "께서 " +
+                                event.getOption("receiver").getAsUser().getAsMention() +"께 한 동료평가 입니다 ! \n\n" +
+                                "동료평가 : " + optionalReview.get().getContent()
+                ).setEphemeral(true).queue();
+
                 break;
 
             case "동료평가조회":
