@@ -291,6 +291,7 @@ public class DiscordListener extends ListenerAdapter {
                     event.reply("이미 동료평가를 작성한 팀원입니다 ! 다른 분의 동료평가를 작성해주세요 !").setEphemeral(true).queue();
                     return ;
                 }
+            
                 // 본인에게 작성할 수 없음
                 if (sendMember.getId().equals(receiveMember.getId())){
                     event.reply("본인에게 동료평가를 작성할 수 없습니다 ! 다른 분의 동료평가를 작성해주세요 !").setEphemeral(true).queue();

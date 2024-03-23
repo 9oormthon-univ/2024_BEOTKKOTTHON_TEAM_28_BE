@@ -69,7 +69,6 @@ public class StartupValleyApplication {
 				Commands.slash("동료평가조회", "팀원들 사이의 동료평가를 조회할 수 있어요 !")
 						.addOption(OptionType.USER, "writer", "동료평가의 평가자를 선택해주세요", true)
 						.addOption(OptionType.USER, "receiver", "동료평가의 피평가자를 선택해주세요", true)
-
 		).queue();
 	}
 
