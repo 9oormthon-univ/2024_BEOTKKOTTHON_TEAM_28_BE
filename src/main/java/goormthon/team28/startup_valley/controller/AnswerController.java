@@ -21,5 +21,4 @@ public class AnswerController {
     ) {
         return ResponseDto.created(answerService.postAnswer(userId, answerCreateDto));
     }
-
 }
