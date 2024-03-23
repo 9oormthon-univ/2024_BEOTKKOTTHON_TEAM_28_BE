@@ -22,6 +22,7 @@ public enum ErrorCode {
     INVALID_CREATE_PEER_REVIEW_SELF(40010, HttpStatus.BAD_REQUEST, "자신에게 리뷰를 작성할 수 없습니다."),
     INVALID_CREATE_PEER_REVIEW_TO_OTHER_TEAM_MEMBER(40011, HttpStatus.BAD_REQUEST, "다른 팀의 멤버에게 리뷰를 작성할 수 없습니다."),
     INVALID_QUERY_PARAMETER(40012, HttpStatus.BAD_REQUEST, "유효하지 않는 쿼리 파라미터입니다."),
+    MISMATCH_TEAM_AND_MEMBER(40013, HttpStatus.BAD_REQUEST, "팀과 멤버가 일치하지 않습니다."),
 
     //401
     INVALID_HEADER_VALUE(40100, HttpStatus.UNAUTHORIZED, "올바르지 않은 헤더값입니다."),
