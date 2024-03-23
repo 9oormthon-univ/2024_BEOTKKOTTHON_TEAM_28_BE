@@ -74,7 +74,7 @@ public class TeamService {
 
         // 스트림 두번 돌리는 거 나중에 최적화 해야 됨
         List<TeamDto> progressingTeamDtoList = teamList.stream()
-                .filter(team -> team.getStatus().equals(EProjectStatus.IN_PROGRESS))
+                .filter(team -> !team.getStatus().equals(EProjectStatus.FINISH))
                 .map(team -> TeamDto.of(
                         team.getId(),
                         team.getName(),
