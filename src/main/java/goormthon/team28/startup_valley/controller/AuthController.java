@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class AuthController {
-    @Value("{$domain.server}")
+    @Value("${domain.server}")
     private String domain;
     private final AuthService authService;
     @PostMapping("/sign-up")

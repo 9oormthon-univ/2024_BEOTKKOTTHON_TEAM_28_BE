@@ -19,7 +19,7 @@ import java.io.IOException;
 @Component
 @RequiredArgsConstructor
 public class DefaultSuccessHandler implements AuthenticationSuccessHandler {
-    @Value("{$domain.server}")
+    @Value("${domain.server}")
     private String domain;
     private final JwtUtil jwtUtil;
     private final UserRepository userRepository;
