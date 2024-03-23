@@ -70,6 +70,9 @@ public class MemberService {
     public Optional<Member> findByTeamAndUser(Team team, User user){
         return memberRepository.findByTeamAndUser(team, user);
     }
+    public List<Member> findAllByTeam(Team team){
+        return memberRepository.findAllByTeam(team);
+    }
     @Transactional
     public void updateTotalWorkTime(Long memberId, Long totalTime){
         memberRepository.updateTotalMinute(memberId, totalTime);
