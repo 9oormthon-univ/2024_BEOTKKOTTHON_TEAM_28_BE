@@ -173,7 +173,7 @@ public class WorkService {
         if (!memberRepository.existsByUserAndTeam(currentUser, team))
             throw new CommonException(ErrorCode.MISMATCH_LOGIN_USER_AND_TEAM);
 
-        List<Work> workList = workRepository.findAllByOwner(targetMember);
+        List<Work> workList = workRepository.findAllByOwnerAndEndAtIsNotNull(targetMember);
         List<WorkDateDto> workDateDtoList = workList.stream()
                 .map(work -> WorkDateDto.of(
                         work.getStartAt().toLocalDate(),
@@ -205,7 +205,7 @@ public class WorkService {
 
         List<WorkDateDto> workDateDtoList = new ArrayList<>();
         for (Member tempMember : memberList) {
-            List<Work> workList = workRepository.findAllByOwner(tempMember);
+            List<Work> workList = workRepository.findAllByOwnerAndEndAtIsNotNull(tempMember);
             workDateDtoList.addAll(
                     workList.stream()
                             .map(work -> WorkDateDto.of(
