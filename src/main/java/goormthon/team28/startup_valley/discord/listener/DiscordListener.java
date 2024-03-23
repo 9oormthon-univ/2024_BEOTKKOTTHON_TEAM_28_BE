@@ -12,7 +12,6 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import org.springframework.transaction.annotation.Transactional;
 
 
 import java.time.Duration;
@@ -35,7 +34,6 @@ public class DiscordListener extends ListenerAdapter {
     private final GptService gptService;
     private final ReviewService reviewService;
     @Override
-    @Transactional
     public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
         LocalDate nowLocalDate = LocalDate.now();
         LocalDateTime nowLocalDateTime = LocalDateTime.now();
@@ -142,11 +140,9 @@ public class DiscordListener extends ListenerAdapter {
                 }
 
                 answerService.saveAnswer(findQuestion, speaker, answerContent, nowLocalDateTime);
-
                 questionService.updateQuestionStatus(findQuestion, EQuestionStatus.FINISH);
 
                 event.reply("답변이 등록 되었습니다 ! ").setEphemeral(true).queue();
-
                 event.getGuild().getTextChannelById(event.getChannel().getId())
                         .sendMessage( maker.getAsMention() +  "님! 질문에 답변이 등록 되었어요 ! \n\n" +
                                 "답변 내용: " + answerContent)
@@ -155,7 +151,6 @@ public class DiscordListener extends ListenerAdapter {
 
             case "업무시작":
                 // 팀, 사용자 조회 -> 팀 멤버 조회
-                Team team = myTeam(event);
                 goormthon.team28.startup_valley.domain.Member member = getMember(event, event.getUser().getName());
                 if (member.getPart() == null){
                     event.reply(event.getMember().getAsMention() +"님이 역할을 아직 입력하지 않으셨어요 ㅠㅠ 역할 입력 해주세요 ~ !").setEphemeral(true).queue();
@@ -171,8 +166,7 @@ public class DiscordListener extends ListenerAdapter {
                 }
 
                 // 업무 생성
-                Work work = workService.saveWork(scrum, member, nowLocalDateTime);
-
+                workService.saveWork(scrum, member, nowLocalDateTime);
                 event.reply(event.getMember().getAsMention() + "의 오늘의 업무가 등록 되었습니다 ! \n\n" +
                                 "오늘의 업무 시작 시간: " + nowLocalDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")))
                         .setEphemeral(true).queue();
@@ -202,7 +196,6 @@ public class DiscordListener extends ListenerAdapter {
                 }
 
                 Long totalTime = worker.getTotalMinute() + todayWork;
-
                 // 업무 시간 DB 반영
                 memberService.updateTotalWorkTime(worker.getId(), totalTime);
 
@@ -395,13 +388,6 @@ public class DiscordListener extends ListenerAdapter {
         }
         return optionalTeam.get();
     }
-    private goormthon.team28.startup_valley.domain.User me(SlashCommandInteractionEvent event){
-        Optional<goormthon.team28.startup_valley.domain.User> optionalUser = userService.findBySerialId(event.getUser().getName());
-        if (optionalUser.isEmpty()){
-            event.reply("웹에 회원가입을 먼저 진행해주세요 !").setEphemeral(true).queue();
-        }
-        return optionalUser.get();
-    }
     private goormthon.team28.startup_valley.domain.User getUser(SlashCommandInteractionEvent event, String userId){
         Optional<goormthon.team28.startup_valley.domain.User> optionalUser = userService.findBySerialId(userId);
         if (optionalUser.isEmpty()){
@@ -430,7 +416,6 @@ public class DiscordListener extends ListenerAdapter {
         String userId = event.getUser().getName();
         return workService.findNotOverWork(getProcessingScrum(event, userId).get(), getMember(event, userId));
     }
-
     public void saveOrGetMember(Team team, Member discordMember, SlashCommandInteractionEvent event) {
         goormthon.team28.startup_valley.domain.Member teamMember = memberService.saveOrGetMember(
                 team,
@@ -441,11 +426,9 @@ public class DiscordListener extends ListenerAdapter {
             teamService.updateLeader(team.getId(), teamMember);
         }
     }
-
     public boolean isTeamLeaderNotSet(Team team) {
         return team.getLeader() == null;
     }
-
     public boolean isGuildOwner(Member discordMember, SlashCommandInteractionEvent event) {
         return discordMember.getUser().getName().equals(event.getGuild().getOwner().getUser().getName());
     }
