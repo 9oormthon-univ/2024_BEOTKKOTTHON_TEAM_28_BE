@@ -128,7 +128,7 @@ public class WorkService {
         if (!team.getLeader().equals(currentMember))
             throw new CommonException(ErrorCode.MISMATCH_MEMBER_AND_TEAM_LEADER);
 
-        List<Work> workList = workRepository.findAllByOwner(targetMember);
+        List<Work> workList = workRepository.findAllByOwnerAndEndAtIsNotNull(targetMember);
         List<WorkManageDto> workManageDtoList = workList.stream()
                 .map(work -> WorkManageDto.of(
                         work.getId(),
