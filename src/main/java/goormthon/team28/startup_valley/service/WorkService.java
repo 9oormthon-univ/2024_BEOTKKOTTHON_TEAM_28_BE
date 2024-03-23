@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -87,6 +88,9 @@ public class WorkService {
                     ))
                     .toList());
         }
+        workDtoList = workDtoList.stream()
+                .sorted(Comparator.comparing(WorkDto::createdAt).reversed())
+                .toList();
 
         return WorkListDto.of(workDtoList, team.getName());
     }
