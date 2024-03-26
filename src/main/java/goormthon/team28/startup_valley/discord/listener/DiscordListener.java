@@ -207,11 +207,11 @@ public class DiscordListener extends ListenerAdapter {
                         .setEphemeral(true).queue();
                 break;
 
-            case "스크럼종료":
+            case "백로그종료":
                 Optional<Scrum> optionalScrum = getProcessingScrum(event, event.getUser().getName());
                 // 종료할 스크럼이 없는 경우
                 if (optionalScrum.isEmpty()){
-                    event.reply("진행 했던 업무가 없어서 스크럼을 종료할 수 없습니다 ㅠㅠ.. 업무를 시작하여 데이터를 만들어 주세요 !!! ")
+                    event.reply("진행 했던 업무가 없어서 백로그를 종료할 수 없습니다 ㅠㅠ.. 업무를 시작하여 데이터를 만들어 주세요 !!! ")
                             .setEphemeral(true).queue();
                     return;
                 }
@@ -220,7 +220,7 @@ public class DiscordListener extends ListenerAdapter {
                 // 업무가 아직 종료되지 않는 것이 있는 경우
                 Optional<Work> optionWork = getMyProcessingWork(event);
                 if (optionWork.isPresent()){
-                    event.reply("진행 중인 업무가 존재합니다 ㅠㅠ 업무를 종료한 뒤, 스크럼을 종료하여 주세요 ! ")
+                    event.reply("진행 중인 업무가 존재합니다 ㅠㅠ 업무를 종료한 뒤, 백로그를 종료하여 주세요 ! ")
                             .setEphemeral(true).queue();
                     return ;
                 }
@@ -242,7 +242,7 @@ public class DiscordListener extends ListenerAdapter {
                             .setEphemeral(true).queue();
                     return ;
                 }
-                event.reply("하나의 스크럼이 마무리 됐어요 ~! 앞으로의 스크럼도 화이팅입니다 ~ !\n")
+                event.reply("하나의 백로그가 마무리 됐어요 ~! 앞으로의 백로그도 화이팅입니다 ~ !\n")
                         .setEphemeral(true).queue();
                 break;
 
@@ -300,7 +300,7 @@ public class DiscordListener extends ListenerAdapter {
                     event.reply("이미 동료평가를 작성한 팀원입니다 ! 다른 분의 동료평가를 작성해주세요 !").setEphemeral(true).queue();
                     return ;
                 }
-            
+
                 // 본인에게 작성할 수 없음
                 if (sendMember.getId().equals(receiveMember.getId())){
                     event.reply("본인에게 동료평가를 작성할 수 없습니다 ! 다른 분의 동료평가를 작성해주세요 !").setEphemeral(true).queue();
