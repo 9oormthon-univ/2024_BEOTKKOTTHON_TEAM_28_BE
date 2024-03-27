@@ -16,10 +16,8 @@
 ![발표5](https://github.com/goormthon-Univ/2024_BEOTKKOTTHON_TEAM_28_BE/assets/79458446/88d571d6-e0a3-4a42-819f-9642383888b1)
 ![발표6](https://github.com/goormthon-Univ/2024_BEOTKKOTTHON_TEAM_28_BE/assets/79458446/d4a078ed-c324-4cd2-8f79-1f8fbea1a0a0)
 
-
-<div align="center">
-
 ## 😎 Member
+<div align="center">
 <table>
   <tr>
     <td align="center"> 백엔드</td>
