@@ -14,6 +14,7 @@ import java.util.Optional;
 public interface ScrumRepository extends JpaRepository<Scrum, Long> {
     Optional<Scrum> findByWorkerAndStatus(Member worker, EScrumStatus status);
     List<Scrum> findAllByWorkerAndStatusOrderByEndAtDesc(Member worker, EScrumStatus status);
+    List<Scrum> findAllByWorkerAndStatus(Member worker, EScrumStatus status);
     @Modifying(clearAutomatically = true)
     @Query("update Scrum s set s.endAt = :end, s.status = :status, s.summary = :summary where s.id = :scrumId")
     void updateScrumAfterOver(Long scrumId, String summary, EScrumStatus status, LocalDate end);
