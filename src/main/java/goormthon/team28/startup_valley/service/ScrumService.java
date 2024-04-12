@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -74,7 +75,7 @@ public class ScrumService {
         List<ScrumDto> scrumDtoList = new ArrayList<>();
         for (Member tempMember : memberList) {
             List<Scrum> scrumList = scrumRepository
-                    .findAllByWorkerAndStatusOrderByEndAtDesc(tempMember, EScrumStatus.FINISH);
+                    .findAllByWorkerAndStatus(tempMember, EScrumStatus.FINISH);
             scrumDtoList.addAll(
                     scrumList.stream()
                             .map(scrum -> ScrumDto.of(
@@ -93,6 +94,9 @@ public class ScrumService {
                             .toList()
             );
         }
+        scrumDtoList = scrumDtoList.stream()
+                .sorted(Comparator.comparing(ScrumDto::endAt).reversed())
+                .toList();
 
         return ScrumListDto.of(scrumDtoList);
     }
