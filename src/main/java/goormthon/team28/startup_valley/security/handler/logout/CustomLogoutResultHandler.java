@@ -29,8 +29,6 @@ public class CustomLogoutResultHandler implements LogoutSuccessHandler {
             AuthenticationResponse.makeFailureResponse(response, ErrorCode.NOT_FOUND_USER);
         }
         CookieUtil.logoutCookie(request, response, domain);
-        CookieUtil.deleteCookie(request, response, Constants.ACCESS_COOKIE_NAME);
-        CookieUtil.deleteCookie(request, response, Constants.REFRESH_COOKIE_NAME);
         AuthenticationResponse.makeSuccessResponse(response);
     }
 }
