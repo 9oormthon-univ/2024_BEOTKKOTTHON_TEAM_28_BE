@@ -38,7 +38,7 @@ public class DiscordListener extends ListenerAdapter {
         LocalDate nowLocalDate = LocalDate.now();
         LocalDateTime nowLocalDateTime = LocalDateTime.now();
         switch (event.getName()) {
-            case "팀원업데이트":
+            case "1-팀원업데이트":
                 // 봇을 제외한 사용자 목록 생성
                 List<Member> discordMembers = event.getGuild().getMembers().stream()
                         .filter(member -> !member.getUser().isBot()).toList();
@@ -60,7 +60,7 @@ public class DiscordListener extends ListenerAdapter {
                 }
                 break;
 
-            case "파트입력하기":
+            case "2-파트입력하기":
                 EPart part = EPart.fromName(event.getOption("part").getAsString(), event);
                 goormthon.team28.startup_valley.domain.Member me = getMember(event, event.getUser().getName());
 
@@ -120,7 +120,7 @@ public class DiscordListener extends ListenerAdapter {
 
                 break;
 
-            case "답변하기":
+            case "질문답변":
                 String code = Objects.requireNonNull(event.getOption("code")).getAsString();
                 Member maker = Objects.requireNonNull(event.getOption("receiver")).getAsMember();
                 String answerContent = Objects.requireNonNull(event.getOption("answer_content")).getAsString();
@@ -207,7 +207,7 @@ public class DiscordListener extends ListenerAdapter {
                         .setEphemeral(true).queue();
                 break;
 
-            case "백로그종료":
+            case "백로그요약":
                 Optional<Scrum> optionalScrum = getProcessingScrum(event, event.getUser().getName());
                 // 종료할 스크럼이 없는 경우
                 if (optionalScrum.isEmpty()){
@@ -246,7 +246,7 @@ public class DiscordListener extends ListenerAdapter {
                         .setEphemeral(true).queue();
                 break;
 
-            case "프로젝트종료":
+            case "3-프로젝트종료":
                 Team project = myTeam(event);
                 goormthon.team28.startup_valley.domain.Member m = getMember(event, event.getUser().getName());
                 if (m.getPart() == null){
@@ -273,7 +273,7 @@ public class DiscordListener extends ListenerAdapter {
 
                 break;
 
-            case "서버최신화":
+            case "e-서버최신화":
                 String newName = event.getGuild().getName();
                 String newImage = event.getGuild().getIconUrl();
                 Team myTeam = myTeam(event);
@@ -285,7 +285,7 @@ public class DiscordListener extends ListenerAdapter {
                 event.reply("서버의 정보가 변경되었습니다 ! 웹으로 확인해주세요 ~").setEphemeral(true).queue();
                 break;
 
-            case "동료평가작성":
+            case "4-동료평가작성":
                 Team targetTeam = myTeam(event);
                 // 프로젝트 팀의 단계가 동료평가 단계인지
                 if (!targetTeam.getStatus().equals(EProjectStatus.PEER_REVIEW)){
@@ -377,14 +377,14 @@ public class DiscordListener extends ListenerAdapter {
                                 "https://client.startupvalley.site/signup\n" +
                                 "* 이 때, 디스코드 아이디를 정확하게 입력해 주세요! *@는 제외합니다!\n" +
                                 "\n" +
-                                "2. 모든 팀원의 회원가입 이후, /(1)팀원업데이트 를 통해 유저들을 해당 웹사이트에 연동시켜 준 다음, 각자 맡은 역할을 /(2)파트입력하기를 통해 등록해 줍니다.\n" +
+                                "2. 모든 팀원의 회원가입 이후, /1-팀원업데이트 를 통해 유저들을 해당 웹사이트에 연동시켜 준 다음, 각자 맡은 역할을 /2-파트입력하기를 통해 등록해 줍니다.\n" +
                                 "\n" +
                                 "3. 해당 과정을 완료하셨다면, 본격적으로 스타트업 밸리에서 업무 시간과 내용을 기록할 수 있어요!\n" +
                                 "\n" +
                                 "[❗프로젝트 마무리]\n" +
                                 "/업무시작, /업무종료, /질문하기, /질문답변, /백로그요약 등의 명령어를 통해 업무를 진행하시다가 프로젝트를 마무리 단계에 도착하셨나요?\n" +
                                 "\n" +
-                                "1. /(3)프로젝트종료 기능을 사용해 프로젝트를 종료해요! \n" +
+                                "1. /3-프로젝트종료 기능을 사용해 프로젝트를 종료해요! \n" +
                                 "*해당 기능은 팀 리더만이 사용할 수 있어요!\n" +
                                 "\n" +
                                 "2. 팀원의 동료 평가를 진행해요!\n" +
