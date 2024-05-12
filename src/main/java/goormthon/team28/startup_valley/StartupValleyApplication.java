@@ -47,30 +47,31 @@ public class StartupValleyApplication {
 				.build();
 
 		jda.updateCommands().addCommands(
-				Commands.slash("팀원업데이트", "웹에 사용자들과 현재 진행하는 프로젝트를 연동해요 ! "),
-				Commands.slash("파트입력하기", "프로젝트에서 맡은 본인의 역할을 입력해 주세요 !")
+				Commands.slash("1-팀원업데이트", "해당 프로젝트의 팀원들을 모두 웹으로 연동해요."),
+				Commands.slash("2-파트입력하기", "프로젝트에서 본인이 맡은 역할을 등록해요.")
 						.addOption(OptionType.STRING, "part", "본인의 역할을 'BACKEND', 'FRONTEND', 'FULLSTACK', 'PM', 'DESIGN' 중에서 입력해주세요 !", true),
 				Commands.slash("질문하기", "궁금한 점을 질문해봐요 ! ")
 						.addOption(OptionType.USER, "receiver", "질문 받을 사람을 선택해주세요 !", true)
 						.addOption(OptionType.STRING, "question_content", "질문 내용을 작성해주세요 !", true),
-				Commands.slash("답변하기", "답변을 통해 팀원을 도와줘요 ! ")
+				Commands.slash("질문답변", "나에게 온 질문들을 답변해주세요 ! 답변을 위해 질문 코드를 입력해야 돼요 !")
 						.addOption(OptionType.STRING, "code", "답변할 질문에 대한 코드를 입력하세요", true)
 						.addOption(OptionType.USER, "receiver", "답변을 받는 사람을 선택해주세요 ! ", true)
 						.addOption(OptionType.STRING, "answer_content", "답변 내용을 작성해주세요 !", true),
-				Commands.slash("업무시작", "오늘의 업무 시간을 시작해요 !"),
-				Commands.slash("업무종료", "오늘의 업무를 종료해요 ! 업무 내용과 함께 기입해주세요 ~ !")
-						.addOption(OptionType.STRING, "work_list", "오늘의 업무 내용을 '; '을 통해서 구분하여 작성해주세요 !! ", true),
-				Commands.slash("백로그종료", "지금까지의 업무들로 하나의 백로그를 생성해요 ! "),
-				Commands.slash("프로젝트종료", "프로젝트의 리더가 결정 할 수 있어요 !  종료하고 동료평가 단계로 넘어가요 ! "),
-				Commands.slash("서버최신화", "디스코드의 서버 이름과 이미지의 변경점을 웹에 적용해요 ! "),
-				Commands.slash("동료평가작성", "개발이 마무리 되셨나요? 프로젝트 종료 이후에 팀원들 사이에 동료평가를 작성할 수 있습니다 !")
+				Commands.slash("업무시작", "업무를 시작하기 위해 명령어를 적어주세요."),
+				Commands.slash("업무종료", "업무 종료 시 해당 명령어와 함께 작업한 내용을 적어주세요.")
+						.addOption(OptionType.STRING, "work_list", "오늘의 업무 내용을 '; '을 통해서 구분하여 작성해주세요 ! ", true),
+				Commands.slash("백로그요약", "업무 종료 시 현재까지 진행한 업무 사항을 백로그로 요약해요."),
+				Commands.slash("3-프로젝트종료", "프로젝트를 종료하고 동료 평가를 진행해요 ! 리더만이 사용할 수 있어요 !"),
+				Commands.slash("e-서버최신화", "디스코드 서버에서 변경된 내용을 웹으로 업데이트 해요."),
+				Commands.slash("4-동료평가작성", "팀원에 대한 리뷰를 작성해요 ! 프로젝트 마무리 시 사용 가능해요 !")
 						.addOption(OptionType.USER, "receiver", "동료평가를 할 사람을 지정해주세요", true)
 						.addOption(OptionType.STRING, "evaluate", "동로평가의 내용을 작성해주세요", true),
 				Commands.slash("동료평가조회", "팀원들 사이의 동료평가를 조회할 수 있어요 !")
 						.addOption(OptionType.USER, "writer", "동료평가의 평가자를 선택해주세요", true)
 						.addOption(OptionType.USER, "receiver", "동료평가의 피평가자를 선택해주세요", true),
-				Commands.slash("전체업무정리하기", "프로젝트의 본인의 역할에 대해서 간단히 설명해요 !")
-						.addOption(OptionType.STRING, "content", "프로젝트에서의 본인의 역할에 대해 작성해주세요", true)
+				Commands.slash("전체업무정리하기", "프로젝트 전체 기간 동안 본인의 업무를 간략하게 적어주세요.")
+						.addOption(OptionType.STRING, "content", "프로젝트에서의 본인의 역할에 대해 작성해주세요", true),
+				Commands.slash("도움말", "Startup Valley 프로덕트를 사용하시기 시작한 여러분들을 위한 안내서입니다. 📖🍀")
 		).queue();
 	}
 
