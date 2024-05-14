@@ -91,14 +91,14 @@ public class QuestionService {
 
         List<Question> questionList;
         switch (sort) {
-            case "all" -> questionList = isReceived ? questionRepository.findAllByReceiver(member)
-                    : questionRepository.findAllBySender(member);
+            case "all" -> questionList = isReceived ? questionRepository.findAllByReceiverOrderByCreatedAtDesc(member)
+                    : questionRepository.findAllBySenderOrderByCreatedAtDesc(member);
             case "completed" -> questionList = isReceived ?
-                    questionRepository.findAllByReceiverAndStatus(member, EQuestionStatus.FINISH) :
-                    questionRepository.findAllBySenderAndStatus(member, EQuestionStatus.FINISH);
+                    questionRepository.findAllByReceiverAndStatusOrderByCreatedAtDesc(member, EQuestionStatus.FINISH) :
+                    questionRepository.findAllBySenderAndStatusOrderByCreatedAtDesc(member, EQuestionStatus.FINISH);
             case "pending" -> questionList = isReceived ?
-                    questionRepository.findAllByReceiverAndStatus(member, EQuestionStatus.WAITING_ANSWER) :
-                    questionRepository.findAllBySenderAndStatus(member, EQuestionStatus.WAITING_ANSWER);
+                    questionRepository.findAllByReceiverAndStatusOrderByCreatedAtDesc(member, EQuestionStatus.WAITING_ANSWER) :
+                    questionRepository.findAllBySenderAndStatusOrderByCreatedAtDesc(member, EQuestionStatus.WAITING_ANSWER);
             default -> throw new CommonException(ErrorCode.INVALID_QUERY_PARAMETER);
         }
         List<QuestionRetrieveSetDto> questionRetrieveSetDtoList = new ArrayList<>();
@@ -107,8 +107,8 @@ public class QuestionService {
             questionRetrieveSetDtoList.add(QuestionRetrieveSetDto.of(
                     QuestionRetrieveDto.of(
                             question.getId(),
-                            currentUser.getNickname(),
-                            currentUser.getProfileImage(),
+                            question.getSender().getUser().getNickname(),
+                            question.getSender().getUser().getProfileImage(),
                             member.getPart(),
                             question.getContent(),
                             question.getCreatedAt()
