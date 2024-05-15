@@ -144,11 +144,11 @@ public class DiscordListener extends ListenerAdapter {
 
                 event.reply("답변이 등록 되었습니다 ! ").setEphemeral(true).queue();
                 event.getGuild().getTextChannelById(event.getChannel().getId())
-                        .sendMessage("질문 내용에 답변이 등록 되었어요 !\n" +
-                                maker.getAsMention() + "님 !" +
-                                "- " + findQuestion.getContent() + "\n" +
+                        .sendMessage("질문 내용에 답변이 등록 되었어요 !\n\n" +
+                                maker.getAsMention() + "\n" +
+                                ">> " + findQuestion.getContent() + "\n" +
                                 event.getMember().getAsMention() + "\n" +
-                                "- " + answerContent)
+                                ">> " + answerContent)
                         .queue();
                 break;
 
