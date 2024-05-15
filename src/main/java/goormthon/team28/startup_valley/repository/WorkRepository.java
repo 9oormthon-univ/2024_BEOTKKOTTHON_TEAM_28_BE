@@ -18,7 +18,7 @@ public interface WorkRepository extends JpaRepository<Work, Long> {
     Optional<Work> findByIdAndOwner(Long workId, Member owner);
     List<Work> findAllByOwner(Member member);
     List<Work> findAllByOwnerAndEndAtIsNotNull(Member member);
-    List<Work> findTop3ByScrum(Scrum scrum);
+    List<Work> findAllByScrumOrderByEndAtDesc(Scrum scrum);
     List<Work> findAllByScrum(Scrum scrum);
 
     @Modifying(clearAutomatically = true)

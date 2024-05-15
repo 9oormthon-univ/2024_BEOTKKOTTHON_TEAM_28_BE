@@ -83,8 +83,9 @@ public class ScrumService {
                                     scrum.getSummary(),
                                     scrum.getStartAt(),
                                     scrum.getEndAt(),
-                                    workRepository.findTop3ByScrum(scrum)
+                                    workRepository.findAllByScrumOrderByEndAtDesc(scrum)
                                             .stream()
+                                            .limit(3)
                                             .map(work -> WorkForScrumDto.of(
                                                     work.getId(),
                                                     work.getContent()
