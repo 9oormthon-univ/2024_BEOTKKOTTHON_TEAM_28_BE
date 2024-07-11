@@ -16,9 +16,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
+
 @Component
 @RequiredArgsConstructor
-public class DefaultSuccessHandler implements AuthenticationSuccessHandler {
+public class Oauth2SuccessHandler implements AuthenticationSuccessHandler {
+
     @Value("${server.domain}")
     private String domain;
     private final JwtUtil jwtUtil;
@@ -26,12 +28,18 @@ public class DefaultSuccessHandler implements AuthenticationSuccessHandler {
 
     @Override
     @Transactional
-    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
-        UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
-        JwtTokenDto jwtTokenDto = jwtUtil.generateTokens(userPrincipal.getUserId(), userPrincipal.getRole());
+    public void onAuthenticationSuccess(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            Authentication authentication
+    ) throws IOException, ServletException {
+        UserPrincipal principal = (UserPrincipal) authentication.getPrincipal();
+        JwtTokenDto jwtTokenDto = jwtUtil.generateTokens(principal.getUserId(), principal.getRole());
 
-        userRepository.updateRefreshToken(userPrincipal.getUserId(), jwtTokenDto.refreshToken());
+        userRepository.updateRefreshToken(principal.getUserId(), jwtTokenDto.refreshToken());
 
         AuthenticationResponse.makeLoginSuccessResponse(response, domain, jwtTokenDto, jwtUtil.getRefreshExpiration());
+
+        response.sendRedirect("https://" + domain);
     }
 }
