@@ -1,6 +1,7 @@
 package goormthon.team28.startup_valley.domain;
 
 import goormthon.team28.startup_valley.dto.type.EProfileImage;
+import goormthon.team28.startup_valley.dto.type.EProvider;
 import goormthon.team28.startup_valley.dto.type.ERole;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -31,6 +32,9 @@ public class User {
     @Column(name = "role", nullable = false)
     @Enumerated(EnumType.STRING)
     private ERole role;
+    @Column(name = "provider", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private EProvider provider;
 
     /*  사용자 이용 정보  */
     @Column(name = "nickname", nullable = false)
@@ -42,20 +46,25 @@ public class User {
     private String refreshToken;
   
     @Builder
-    public User(String serialId, String password, ERole role, String nickname, EProfileImage profileImage) {
+    public User(
+            String serialId,
+            String password,
+            ERole role,
+            EProfileImage profileImage,
+            EProvider provider
+    ) {
         this.serialId = serialId;
         this.password = password;
         this.role = role;
-        this.nickname = nickname;
         this.profileImage = profileImage;
+        this.provider = provider;
     }
 
     public void updateRefreshToken(String refreshToken) {
         this.refreshToken = refreshToken;
     }
 
-    public void updateUserInfo(String nickname, EProfileImage eProfileImage) {
-        this.nickname = nickname;
+    public void updateUserInfo(EProfileImage eProfileImage) {
         this.profileImage = eProfileImage;
     }
 }
