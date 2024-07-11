@@ -52,7 +52,6 @@ public class CustomOauth2UserDetailService extends DefaultOAuth2UserService {
                                             bCryptPasswordEncoder
                                                     .encode(UUID.randomUUID().toString())
                                     )
-                                    .nickname(oauth2UserInfo.getNickname())
                                     .provider(provider)
                                     .role(ERole.USER)
                                     .build()

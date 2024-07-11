@@ -50,14 +50,12 @@ public class User {
             String serialId,
             String password,
             ERole role,
-            String nickname,
             EProfileImage profileImage,
             EProvider provider
     ) {
         this.serialId = serialId;
         this.password = password;
         this.role = role;
-        this.nickname = nickname;
         this.profileImage = profileImage;
         this.provider = provider;
     }
@@ -66,8 +64,7 @@ public class User {
         this.refreshToken = refreshToken;
     }
 
-    public void updateUserInfo(String nickname, EProfileImage eProfileImage) {
-        this.nickname = nickname;
+    public void updateUserInfo(EProfileImage eProfileImage) {
         this.profileImage = eProfileImage;
     }
 }
