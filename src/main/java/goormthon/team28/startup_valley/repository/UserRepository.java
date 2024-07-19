@@ -17,7 +17,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByIdAndRefreshToken(Long id, String refreshToken);
     @Modifying(clearAutomatically = true)
     @Query("update User u set u.refreshToken = :refreshToken where u.id = :userId")
-    void updateRefreshTokenAndLoginStatus(Long userId, String refreshToken);
+    void updateRefreshToken(Long userId, String refreshToken);
     Optional<User> findById(Long userId);
     Optional<User> findBySerialId(String serialId);
     boolean existsBySerialId(String serialId);
