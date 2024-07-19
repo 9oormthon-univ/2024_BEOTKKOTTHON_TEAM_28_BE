@@ -28,7 +28,6 @@ public class AuthService {
                         .profileImage(Enum.valueOf(EProfileImage.class, authSignUpDto.profileImage().toUpperCase()))
                         .serialId(authSignUpDto.serialId())
                         .password(bCryptPasswordEncoder.encode(authSignUpDto.password()))
-                        .nickname(authSignUpDto.nickname())
                         .role(ERole.USER)
                 .build()
         );
