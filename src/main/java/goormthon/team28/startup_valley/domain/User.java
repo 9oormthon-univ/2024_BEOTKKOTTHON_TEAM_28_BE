@@ -64,7 +64,8 @@ public class User {
         this.refreshToken = refreshToken;
     }
 
-    public void updateUserInfo(EProfileImage eProfileImage) {
+    public void updateUserInfo(String nickname, EProfileImage eProfileImage) {
+        this.nickname = nickname;
         this.profileImage = eProfileImage;
     }
 }
