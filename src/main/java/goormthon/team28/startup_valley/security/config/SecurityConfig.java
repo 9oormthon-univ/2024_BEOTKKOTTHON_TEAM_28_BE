@@ -6,9 +6,12 @@ import goormthon.team28.startup_valley.security.handler.exception.CustomAccessDe
 import goormthon.team28.startup_valley.security.handler.exception.CustomAuthenticationEntryPointHandler;
 import goormthon.team28.startup_valley.security.handler.login.DefaultFailureHandler;
 import goormthon.team28.startup_valley.security.handler.login.DefaultSuccessHandler;
+import goormthon.team28.startup_valley.security.handler.login.Oauth2FailureHandler;
+import goormthon.team28.startup_valley.security.handler.login.Oauth2SuccessHandler;
 import goormthon.team28.startup_valley.security.handler.logout.CustomLogoutProcessHandler;
 import goormthon.team28.startup_valley.security.handler.logout.CustomLogoutResultHandler;
 import goormthon.team28.startup_valley.security.provider.JwtAuthenticationManager;
+import goormthon.team28.startup_valley.security.service.CustomOauth2UserDetailService;
 import goormthon.team28.startup_valley.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -24,14 +27,19 @@ import org.springframework.security.web.authentication.logout.LogoutFilter;
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
+
     private final JwtUtil jwtUtil;
     private final JwtAuthenticationManager jwtAuthenticationManager;
     private final DefaultSuccessHandler defaultSuccessHandler;
     private final DefaultFailureHandler defaultFailureHandler;
+    private final Oauth2SuccessHandler oauth2SuccessHandler;
+    private final Oauth2FailureHandler oauth2FailureHandler;
+    private final CustomOauth2UserDetailService customOauth2UserDetailService;
     private final CustomLogoutProcessHandler customLogoutProcessHandler;
     private final CustomLogoutResultHandler customLogoutResultHandler;
     private final CustomAccessDeniedHandler customAccessDeniedHandler;
     private final CustomAuthenticationEntryPointHandler customAuthenticationEntryPointHandler;
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
@@ -54,6 +62,11 @@ public class SecurityConfig {
                         .passwordParameter("password")
                         .successHandler(defaultSuccessHandler)
                         .failureHandler(defaultFailureHandler)
+                )
+                .oauth2Login(login -> login
+                        .successHandler(oauth2SuccessHandler)
+                        .failureHandler(oauth2FailureHandler)
+                        .userInfoEndpoint(it -> it.userService(customOauth2UserDetailService))
                 )
                 .logout(logout -> logout
                         .logoutUrl("/api/users/sign-out")

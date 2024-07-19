@@ -8,23 +8,37 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Map;
 
 @Getter
 @Builder
 @RequiredArgsConstructor
-public class UserPrincipal implements UserDetails {
+public class UserPrincipal implements UserDetails, OAuth2User {
     private final Long userId;
     private final String password;
     private final ERole role;
+    private final Map<String, Object> attributes;
     private final Collection<? extends GrantedAuthority> authorities;
+
     public static UserPrincipal create(UserRepository.UserSecurityForm securityForm){
         return UserPrincipal.builder()
                 .userId(securityForm.getId())
                 .password(securityForm.getPassword())
                 .role(securityForm.getRole())
+                .authorities(Collections.singleton(new SimpleGrantedAuthority(securityForm.getRole().getSecurityRole())))
+                .build();
+    }
+
+    public static UserPrincipal create(UserRepository.UserSecurityForm securityForm, Map<String, Object> attributes) {
+        return UserPrincipal.builder()
+                .userId(securityForm.getId())
+                .password(securityForm.getPassword())
+                .role(securityForm.getRole())
+                .attributes(attributes)
                 .authorities(Collections.singleton(new SimpleGrantedAuthority(securityForm.getRole().getSecurityRole())))
                 .build();
     }
@@ -62,5 +76,15 @@ public class UserPrincipal implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    @Override
+    public Map<String, Object> getAttributes() {
+        return attributes;
+    }
+
+    @Override
+    public String getName() {
+        return userId.toString();
     }
 }

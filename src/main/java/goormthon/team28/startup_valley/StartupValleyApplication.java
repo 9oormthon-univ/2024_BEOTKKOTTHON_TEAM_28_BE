@@ -4,6 +4,7 @@ import goormthon.team28.startup_valley.discord.info.DiscordBotToken;
 import goormthon.team28.startup_valley.discord.listener.DiscordListener;
 import goormthon.team28.startup_valley.service.*;
 import jakarta.annotation.PostConstruct;
+import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;
@@ -18,6 +19,7 @@ import org.springframework.context.ApplicationContext;
 
 import java.util.TimeZone;
 
+@Slf4j
 @SpringBootApplication
 public class StartupValleyApplication {
 	@PostConstruct
@@ -27,6 +29,7 @@ public class StartupValleyApplication {
 	public static void main(String[] args) {
 		ApplicationContext context = SpringApplication.run(StartupValleyApplication.class, args);
 
+		log.info("Initializing JDA");
 		JDA jda = JDABuilder.createDefault(context.getBean(DiscordBotToken.class).getToken())
 				.enableIntents(GatewayIntent.MESSAGE_CONTENT, GatewayIntent.GUILD_MEMBERS)
 				.setChunkingFilter(ChunkingFilter.ALL)
@@ -45,6 +48,7 @@ public class StartupValleyApplication {
 						)
 				)
 				.build();
+		log.info("Finished Initializing JDA");
 
 		jda.updateCommands().addCommands(
 				Commands.slash("1-팀원업데이트", "해당 프로젝트의 팀원들을 모두 웹으로 연동해요."),
@@ -74,5 +78,4 @@ public class StartupValleyApplication {
 				Commands.slash("도움말", "Startup Valley 프로덕트를 사용하시기 시작한 여러분들을 위한 안내서입니다. 📖🍀")
 		).queue();
 	}
-
 }

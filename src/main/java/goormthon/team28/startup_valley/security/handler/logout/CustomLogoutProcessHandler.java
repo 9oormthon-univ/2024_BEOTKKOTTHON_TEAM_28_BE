@@ -24,6 +24,6 @@ public class CustomLogoutProcessHandler implements LogoutHandler {
             throw new CommonException(ErrorCode.INVALID_TOKEN_ERROR);
         }
         UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
-        userRepository.updateRefreshTokenAndLoginStatus(userPrincipal.getUserId(), null);
+        userRepository.updateRefreshToken(userPrincipal.getUserId(), null);
     }
 }
