@@ -21,6 +21,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findById(Long userId);
     Optional<User> findBySerialId(String serialId);
     boolean existsBySerialId(String serialId);
+    boolean existsByIdAndNicknameIsNull(Long id);
 
     interface UserSecurityForm {
         Long getId();
