@@ -37,9 +37,9 @@ public class User {
     private EProvider provider;
 
     /*  사용자 이용 정보  */
-    @Column(name = "nickname", nullable = false)
+    @Column(name = "nickname")
     private String nickname;
-    @Column(name = "profile_image", nullable = false)
+    @Column(name = "profile_image")
     @Enumerated(EnumType.STRING)
     private EProfileImage profileImage;
     @Column(name = "refresh_Token")
