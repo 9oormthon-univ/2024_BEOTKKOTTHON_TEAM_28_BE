@@ -30,8 +30,6 @@ public class SecurityConfig {
 
     private final JwtUtil jwtUtil;
     private final JwtAuthenticationManager jwtAuthenticationManager;
-    private final DefaultSuccessHandler defaultSuccessHandler;
-    private final DefaultFailureHandler defaultFailureHandler;
     private final Oauth2SuccessHandler oauth2SuccessHandler;
     private final Oauth2FailureHandler oauth2FailureHandler;
     private final CustomOauth2UserDetailService customOauth2UserDetailService;
@@ -50,18 +48,9 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests(request ->
                         request
-                                .requestMatchers("/login").permitAll()
-                                .requestMatchers("/api/auth/**").permitAll()
+                                .requestMatchers("/api/oauth2/sign-up").permitAll()
                                 .requestMatchers("/api/**").hasAnyRole("USER")
                                 .anyRequest().authenticated()
-                )
-                .formLogin(login -> login
-                        .loginPage("/login")
-                        .loginProcessingUrl("/api/auth/sign-in")
-                        .usernameParameter("serial_id")
-                        .passwordParameter("password")
-                        .successHandler(defaultSuccessHandler)
-                        .failureHandler(defaultFailureHandler)
                 )
                 .oauth2Login(login -> login
                         .successHandler(oauth2SuccessHandler)
@@ -83,7 +72,6 @@ public class SecurityConfig {
                 .addFilterBefore(
                         new JwtExceptionFilter(), JwtAuthenticationFilter.class
                 )
-
                 .getOrBuild();
     }
 }

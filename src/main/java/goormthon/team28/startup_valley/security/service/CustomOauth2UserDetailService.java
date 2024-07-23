@@ -30,6 +30,7 @@ public class CustomOauth2UserDetailService extends DefaultOAuth2UserService {
     public OAuth2User loadUser(
             OAuth2UserRequest userRequest
     ) throws OAuth2AuthenticationException {
+        log.info("Oauth2UserRequest 진입, userRequest = {}", userRequest);
         // provider 가져오기
         EProvider provider = EProvider.valueOf(
                 userRequest.getClientRegistration().getRegistrationId().toUpperCase()

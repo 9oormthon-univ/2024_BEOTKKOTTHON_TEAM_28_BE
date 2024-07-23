@@ -23,6 +23,13 @@ public class Oauth2SuccessHandler implements AuthenticationSuccessHandler {
 
     @Value("${server.domain}")
     private String domain;
+
+    @Value("${server.sign-up-redirect-url}")
+    private String signUpRedirectUrl;
+
+    @Value("${server.home-redirect-url}")
+    private String homeRedirectUrl;
+
     private final JwtUtil jwtUtil;
     private final UserRepository userRepository;
 
@@ -40,6 +47,9 @@ public class Oauth2SuccessHandler implements AuthenticationSuccessHandler {
 
         AuthenticationResponse.makeLoginSuccessResponse(response, domain, jwtTokenDto, jwtUtil.getRefreshExpiration());
 
-        response.sendRedirect("https://" + domain);
+        if (userRepository.existsByIdAndNicknameIsNull(principal.getUserId()))
+            response.sendRedirect(signUpRedirectUrl); // 최초 로그인
+        else
+            response.sendRedirect(homeRedirectUrl);
     }
 }
