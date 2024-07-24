@@ -53,6 +53,7 @@ public class CustomOauth2UserDetailService extends DefaultOAuth2UserService {
                                             bCryptPasswordEncoder
                                                     .encode(UUID.randomUUID().toString())
                                     )
+                                    .discordId(oauth2UserInfo.getDiscordId())
                                     .provider(provider)
                                     .role(ERole.USER)
                                     .build()
