@@ -9,7 +9,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicUpdate;
-import org.springframework.transaction.annotation.Transactional;
 
 @Entity
 @Getter
@@ -64,7 +63,8 @@ public class User {
         this.refreshToken = refreshToken;
     }
 
-    public void updateUserInfo(EProfileImage eProfileImage) {
+    public void updateUserInfo(String nickname, EProfileImage eProfileImage) {
+        this.nickname = nickname;
         this.profileImage = eProfileImage;
     }
 }
