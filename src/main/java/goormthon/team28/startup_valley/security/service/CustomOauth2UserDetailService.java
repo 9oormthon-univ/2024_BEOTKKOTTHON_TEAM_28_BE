@@ -1,6 +1,7 @@
 package goormthon.team28.startup_valley.security.service;
 
 import goormthon.team28.startup_valley.domain.User;
+import goormthon.team28.startup_valley.dto.type.EProfileImage;
 import goormthon.team28.startup_valley.dto.type.EProvider;
 import goormthon.team28.startup_valley.dto.type.ERole;
 import goormthon.team28.startup_valley.repository.UserRepository;
@@ -54,8 +55,9 @@ public class CustomOauth2UserDetailService extends DefaultOAuth2UserService {
                                                     .encode(UUID.randomUUID().toString())
                                     )
                                     .discordId(oauth2UserInfo.getDiscordId())
-                                    .provider(provider)
                                     .role(ERole.USER)
+                                    .profileImage(EProfileImage.TOMATO)
+                                    .provider(provider)
                                     .build()
                     );
                     return UserRepository.UserSecurityForm.invoke(newUser);
