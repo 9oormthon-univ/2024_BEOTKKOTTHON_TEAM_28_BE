@@ -9,7 +9,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicUpdate;
-import org.springframework.transaction.annotation.Transactional;
 
 @Entity
 @Getter
@@ -17,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Table(name = "users")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -25,13 +25,17 @@ public class User {
     /*  사용자 인증 및 권한 정보   */
     @Column(name = "serial_id", nullable = false, unique = true)
     private String serialId; // discord serial id
+
     @Column(name = "password", nullable = false)
     private String password;
-    @Column(name = "discord_id")
-    private Long discordId;
+
+    @Column(name = "discord_id", nullable = false, unique = true)
+    private String discordId;
+
     @Column(name = "role", nullable = false)
     @Enumerated(EnumType.STRING)
     private ERole role;
+
     @Column(name = "provider", nullable = false)
     @Enumerated(EnumType.STRING)
     private EProvider provider;
@@ -39,9 +43,11 @@ public class User {
     /*  사용자 이용 정보  */
     @Column(name = "nickname")
     private String nickname;
+
     @Column(name = "profile_image")
     @Enumerated(EnumType.STRING)
     private EProfileImage profileImage;
+
     @Column(name = "refresh_Token")
     private String refreshToken;
   
@@ -49,12 +55,14 @@ public class User {
     public User(
             String serialId,
             String password,
+            String discordId,
             ERole role,
             EProfileImage profileImage,
             EProvider provider
     ) {
         this.serialId = serialId;
         this.password = password;
+        this.discordId = discordId;
         this.role = role;
         this.profileImage = profileImage;
         this.provider = provider;

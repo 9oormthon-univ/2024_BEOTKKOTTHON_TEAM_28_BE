@@ -10,4 +10,5 @@ import java.util.Map;
 public abstract class Oauth2UserInfo {
     protected final Map<String, Object> attributes;
     public abstract String getId();
+    public abstract String getDiscordId();
 }

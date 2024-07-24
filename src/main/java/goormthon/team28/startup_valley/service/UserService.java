@@ -21,13 +21,16 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class UserService {
+
     private final UserRepository userRepository;
     private final MemberRepository memberRepository;
-    public Optional<User> findBySerialId(String serialId){
-        return userRepository.findBySerialId(serialId);
+
+    public Optional<User> findByDiscordId(String discordId){
+        return userRepository.findByDiscordId(discordId);
     }
-    public boolean isExisted(String serialId){
-        return userRepository.existsBySerialId(serialId);
+
+    public boolean isExisted(String discordId){
+        return userRepository.existsByDiscordId(discordId);
     }
 
     public UserDto getUserInfo(Long userId) {
