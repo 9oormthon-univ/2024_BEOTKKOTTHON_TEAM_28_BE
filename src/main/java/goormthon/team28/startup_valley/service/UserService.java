@@ -21,11 +21,14 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class UserService {
+
     private final UserRepository userRepository;
     private final MemberRepository memberRepository;
+
     public Optional<User> findBySerialId(String serialId){
         return userRepository.findBySerialId(serialId);
     }
+
     public boolean isExisted(String serialId){
         return userRepository.existsBySerialId(serialId);
     }
