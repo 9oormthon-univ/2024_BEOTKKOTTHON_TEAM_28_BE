@@ -59,9 +59,8 @@ public class DiscordListener extends ListenerAdapter {
                     log.info("멤버 생성 완료");
 
                     event.reply("팀 과 팀 멤버를 연결했어요! '파트입력하기' 명령어를 통해 역할을 알려주세요 !!").setEphemeral(true).queue();
-                } else {
+                } else
                     event.reply("웹에 회원가입이 필요합니다!\n\n" + "회원가입 해주세요 !! : " + noSignUp.toString()).setEphemeral(true).queue();
-                }
                 break;
 
             case "2-파트입력하기":
