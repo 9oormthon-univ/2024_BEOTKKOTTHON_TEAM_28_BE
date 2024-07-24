@@ -19,8 +19,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("update User u set u.refreshToken = :refreshToken where u.id = :userId")
     void updateRefreshToken(Long userId, String refreshToken);
     Optional<User> findById(Long userId);
-    Optional<User> findBySerialId(String serialId);
-    boolean existsBySerialId(String serialId);
+    Optional<User> findByDiscordId(String discordId);
+    boolean existsByDiscordId(String discordId);
     boolean existsByIdAndNicknameIsNull(Long id);
 
     interface UserSecurityForm {

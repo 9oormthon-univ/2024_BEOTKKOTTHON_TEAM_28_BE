@@ -26,8 +26,8 @@ public class User {
     private String serialId; // discord serial id
     @Column(name = "password", nullable = false)
     private String password;
-    @Column(name = "discord_id")
-    private Long discordId;
+    @Column(name = "discord_id", nullable = false, unique = true)
+    private String discordId;
     @Column(name = "role", nullable = false)
     @Enumerated(EnumType.STRING)
     private ERole role;
@@ -48,12 +48,14 @@ public class User {
     public User(
             String serialId,
             String password,
+            String discordId,
             ERole role,
             EProfileImage profileImage,
             EProvider provider
     ) {
         this.serialId = serialId;
         this.password = password;
+        this.discordId = discordId;
         this.role = role;
         this.profileImage = profileImage;
         this.provider = provider;

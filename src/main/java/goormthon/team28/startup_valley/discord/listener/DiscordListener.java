@@ -405,9 +405,9 @@ public class DiscordListener extends ListenerAdapter {
 
         List<String> usersWithoutInfo = new ArrayList<>();
         for (Member member : members) {
-            String serialId = member.getUser().getName();
-            if (!userService.isExisted(serialId))
-                usersWithoutInfo.add(serialId);
+            String discordId = member.getUser().getName();
+            if (!userService.isExisted(discordId))
+                usersWithoutInfo.add(discordId);
         }
         return usersWithoutInfo;
     }
@@ -423,7 +423,7 @@ public class DiscordListener extends ListenerAdapter {
             SlashCommandInteractionEvent event,
             String userId
     ){
-        Optional<goormthon.team28.startup_valley.domain.User> optionalUser = userService.findBySerialId(userId);
+        Optional<goormthon.team28.startup_valley.domain.User> optionalUser = userService.findByDiscordId(userId);
         if (optionalUser.isEmpty())
             event.reply("웹에 회원가입을 먼저 진행해주세요 !").setEphemeral(true).queue();
         return optionalUser.get();
