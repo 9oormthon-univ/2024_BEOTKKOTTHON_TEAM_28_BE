@@ -28,6 +28,7 @@ public class WorkService {
     private final MemberRepository memberRepository;
     private final TeamRepository teamRepository;
     private final WorkRepository workRepository;
+
     @Transactional
     public Work saveWork(Scrum scrum, Member member, LocalDateTime now){
         return workRepository.save(Work.builder()
@@ -37,14 +38,17 @@ public class WorkService {
                 .build()
         );
     }
+
     @Transactional
     public void updateWorkAfterOver(Long workId, String works, LocalDateTime overTime){
         workRepository.updateWorkAfterOver(workId, works, overTime);
     }
+
     public Work findById(Long workId){
         return workRepository.findById(workId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_WORK));
     }
+
     public List<Work> findAllByScrum(Scrum scrum){
         return workRepository.findAllByScrum(scrum);
     }
