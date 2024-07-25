@@ -103,7 +103,16 @@ public class TeamService {
         Member targetMember = memberRepository.findById(membersId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_MEMBER));
         User targetUser = targetMember.getUser();
+        User currentUser =  userRepository.findById(userId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
         List<Member> memberList = memberRepository.findAllByUser(targetUser);
+        List<Member> verifyAssociation = memberList.stream()
+                .filter(member ->
+                        memberRepository.existsByUserAndTeam(currentUser, member.getTeam())
+                )
+                .toList();
+        if (verifyAssociation.isEmpty())
+            throw new CommonException(ErrorCode.INVALID_LOGIN_USER_AND_TARGET_MEMBER);
 
         Stream<Member> memberStream;
         switch (sort) {
