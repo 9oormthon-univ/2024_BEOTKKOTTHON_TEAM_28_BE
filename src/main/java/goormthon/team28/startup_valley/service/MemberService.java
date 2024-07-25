@@ -39,12 +39,12 @@ public class MemberService {
 
         User currentUser = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
-
-        if (!memberRepository.existsByUser(currentUser))
-            throw new CommonException(ErrorCode.NOT_FOUND_MEMBER);
-
         Team team = teamRepository.findById(teamsId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_TEAM));
+
+        if (!memberRepository.existsByUserAndTeam(currentUser, team))
+            throw new CommonException(ErrorCode.MISMATCH_LOGIN_USER_AND_TEAM);
+
         List<Member> memberList = memberRepository.findAllByTeam(team);
         List<MemberDto> memberDtoList = memberList.stream()
                 .map(member -> MemberDto.of(
