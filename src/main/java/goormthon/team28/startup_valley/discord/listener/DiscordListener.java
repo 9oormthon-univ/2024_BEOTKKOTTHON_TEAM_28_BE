@@ -70,7 +70,7 @@ public class DiscordListener extends ListenerAdapter {
                 // 팀원 파트 입력하기
                 memberService.updatePart(me.getId(), part);
 
-                event.reply(event.getUser().getAsMention() + " 파트 입력까지 완료 되었습니다 !, 앞으로의 멋진 협업을 기대합니다 ! ")
+                event.reply(event.getUser().getAsMention() + " 파트 입력까지 완료 되었습니다 ! 앞으로의 멋진 협업을 기대합니다 ! ")
                         .setEphemeral(true).queue();
 
                 break;
