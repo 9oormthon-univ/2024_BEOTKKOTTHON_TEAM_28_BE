@@ -99,7 +99,47 @@ public class WorkService {
         return WorkListDto.of(workDtoList, team.getName());
     }
 
-    public RankingListDto getRanking(Long userId, Long teamsId) {
+    public TeamWorkStatusDto getTeamWorkStatus(Long userId, Long teamsId) {
+
+        User currentUser = userRepository.findById(userId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+        Team team = teamRepository.findById(teamsId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_TEAM));
+
+        // 해당 팀의 멤버가 아닐 수도 있는 경우 체크
+        if (!memberRepository.existsByUserAndTeam(currentUser, team))
+            throw new CommonException(ErrorCode.MISMATCH_LOGIN_USER_AND_TEAM);
+
+        LocalDate startDate = DateUtil.getOneWeekAgoDate().toLocalDate();
+        LocalDate endDate = LocalDateTime.now().toLocalDate();
+
+        List<UserDto> currentWorkerListDto = userRepository.findByNowWorking(teamsId)
+                .stream()
+                .map(user -> UserDto.of(
+                        user.getId(),
+                        null,
+                        user.getNickname(),
+                        user.getProfileImage()
+                ))
+                .toList();
+
+        Optional<String> latestWorkContent = Optional.empty();
+        if (currentWorkerListDto.isEmpty()) {
+            Member currentMember = memberRepository.findByTeamAndUser(team, currentUser)
+                    .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_MEMBER));
+            latestWorkContent = workRepository.findByMemberAndLatestDate(currentMember.getId());
+        }
+
+        return TeamWorkStatusDto.of(
+                startDate.toString(),
+                endDate.toString(),
+                currentWorkerListDto,
+                latestWorkContent.orElse(null),
+                team.getName()
+        );
+    }
+
+    public RankingDto getRanking(Long userId, Long teamsId) {
 
         User currentUser = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
