@@ -7,17 +7,16 @@ import goormthon.team28.startup_valley.dto.type.EPart;
 import goormthon.team28.startup_valley.exception.CommonException;
 import goormthon.team28.startup_valley.exception.ErrorCode;
 import goormthon.team28.startup_valley.repository.*;
+import goormthon.team28.startup_valley.util.DateUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -150,17 +149,89 @@ public class WorkService {
         if (!memberRepository.existsByUserAndTeam(currentUser, team))
             throw new CommonException(ErrorCode.NOT_FOUND_MEMBER);
 
-        List<Member> memberList = memberRepository.findAllByTeamOrderByTotalMinuteDesc(team);
-        List<RankingDto> rankingDtoList = memberList.stream()
-                .map(member -> RankingDto.of(
-                        member.getId(),
-                        member.getUser().getNickname(),
-                        member.getUser().getProfileImage(),
-                        member.getTotalMinute()
-                ))
-                .toList();
+        LocalDateTime startDate = DateUtil.getOneWeekAgoDate();
+        return RankingDto.of(
+                getWorkedDateRanking(teamsId, startDate),
+                getWorkedTimeRanking(teamsId, startDate),
+                getQuestionTimes(teamsId, startDate),
+                getFastAnswered(teamsId, startDate),
+                getDetailedBacklog(teamsId, startDate)
+        );
+    }
 
-        return RankingListDto.of(rankingDtoList, team.getName());
+    private List<RankingElementDto> getWorkedDateRanking(Long teamId, LocalDateTime startDate) {
+        return memberRepository.findAllByTeamAndStartDateOrderByWorkDay(teamId, startDate.toLocalDate())
+                .stream()
+                .map(object -> {
+                        Member tempMember = memberRepository.findById((Long) object[0])
+                                .orElseThrow(() -> new CommonException(ErrorCode.INTERNAL_SERVER_ERROR));
+                            return RankingElementDto.of(
+                                    MemberInfoDto.of(tempMember),
+                                    (Long) object[1]
+                            );
+                        }
+                )
+                .toList();
+    }
+
+    private List<RankingElementDto> getWorkedTimeRanking(Long teamId, LocalDateTime startDate) {
+        return memberRepository.findByAllByTeamAndStartDateOrderByWorkTime(teamId, startDate.toLocalDate())
+                .stream()
+                .map(object -> {
+                        Member tempMember = memberRepository.findById((Long) object[0])
+                                .orElseThrow(() -> new CommonException(ErrorCode.INTERNAL_SERVER_ERROR));
+                        return RankingElementDto.of(
+                                    MemberInfoDto.of(tempMember),
+                                    ((Number) object[1]).longValue()
+                            );
+                    }
+                )
+                .toList();
+    }
+
+    private List<RankingElementDto> getQuestionTimes(Long teamId, LocalDateTime startDate) {
+        return memberRepository.findByAllByTeamAndStartDateOrderByQuestionTimes(teamId, startDate.toLocalDate())
+                .stream()
+                .map(object -> {
+                        Member tempMember = memberRepository.findById((Long) object[0])
+                                .orElseThrow(() -> new CommonException(ErrorCode.INTERNAL_SERVER_ERROR));
+                        return RankingElementDto.of(
+                                    MemberInfoDto.of(tempMember),
+                                    (Long) object[1]
+                            );
+                    }
+                )
+                .toList();
+    }
+
+    private List<RankingElementDto> getFastAnswered(Long teamId, LocalDateTime startDate) {
+        return memberRepository.findByAllByTeamAndStartDateOrderByFastAnswered(teamId, startDate.toLocalDate())
+                .stream()
+                .map(object -> {
+                        Member tempMember = memberRepository.findById((Long) object[0])
+                                .orElseThrow(() -> new CommonException(ErrorCode.INTERNAL_SERVER_ERROR));
+                        return RankingElementDto.of(
+                                    MemberInfoDto.of(tempMember),
+                                    (Long) object[1]
+                            );
+                    }
+                )
+                .toList();
+    }
+
+    private List<RankingElementDto> getDetailedBacklog(Long teamId, LocalDateTime startDate) {
+        return memberRepository.findByAllByTeamAndStartDateOrderByDetailedBacklog(teamId, startDate.toLocalDate())
+                .stream()
+                .map(object -> {
+                        Member tempMember = memberRepository.findById((Long) object[0])
+                                .orElseThrow(() -> new CommonException(ErrorCode.INTERNAL_SERVER_ERROR));
+                        return RankingElementDto.of(
+                                    MemberInfoDto.of(tempMember),
+                                    ((Number) object[1]).longValue()
+                            );
+                    }
+                )
+                .toList();
     }
 
     public WorkManageListDto listManageWork(Long userId, Long membersId) {
