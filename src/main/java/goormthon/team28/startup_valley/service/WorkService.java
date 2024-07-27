@@ -17,6 +17,7 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -300,6 +301,10 @@ public class WorkService {
                 ))
                 .toList();
 
+        Set<LocalDate> workDays = workList.stream()
+                .map(work -> work.getEndAt().toLocalDate())
+                .collect(Collectors.toCollection(HashSet::new));
+
         Optional<Long> maxTime = workDateDtoList.stream()
                 .map(WorkDateDto::time)
                 .max(Long::compareTo);
@@ -307,7 +312,7 @@ public class WorkService {
         return WorkMeasureDto.of(
                 targetMember.getUser().getNickname(),
                 targetMember.getTotalMinute(),
-                workDateDtoList.size(),
+                workDays.size(),
                 maxTime.orElse(0L),
                 workDateDtoList
         );
