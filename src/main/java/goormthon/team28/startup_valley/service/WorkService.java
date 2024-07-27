@@ -7,6 +7,7 @@ import goormthon.team28.startup_valley.dto.type.EPart;
 import goormthon.team28.startup_valley.exception.CommonException;
 import goormthon.team28.startup_valley.exception.ErrorCode;
 import goormthon.team28.startup_valley.repository.*;
+import goormthon.team28.startup_valley.util.DateUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -27,6 +28,7 @@ public class WorkService {
     private final MemberRepository memberRepository;
     private final TeamRepository teamRepository;
     private final WorkRepository workRepository;
+
     @Transactional
     public Work saveWork(Scrum scrum, Member member, LocalDateTime now){
         return workRepository.save(Work.builder()
@@ -36,14 +38,17 @@ public class WorkService {
                 .build()
         );
     }
+
     @Transactional
     public void updateWorkAfterOver(Long workId, String works, LocalDateTime overTime){
         workRepository.updateWorkAfterOver(workId, works, overTime);
     }
+
     public Work findById(Long workId){
         return workRepository.findById(workId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_WORK));
     }
+
     public List<Work> findAllByScrum(Scrum scrum){
         return workRepository.findAllByScrum(scrum);
     }
@@ -94,7 +99,47 @@ public class WorkService {
         return WorkListDto.of(workDtoList, team.getName());
     }
 
-    public RankingListDto getRanking(Long userId, Long teamsId) {
+    public TeamWorkStatusDto getTeamWorkStatus(Long userId, Long teamsId) {
+
+        User currentUser = userRepository.findById(userId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+        Team team = teamRepository.findById(teamsId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_TEAM));
+
+        // 해당 팀의 멤버가 아닐 수도 있는 경우 체크
+        if (!memberRepository.existsByUserAndTeam(currentUser, team))
+            throw new CommonException(ErrorCode.MISMATCH_LOGIN_USER_AND_TEAM);
+
+        LocalDate startDate = DateUtil.getOneWeekAgoDate().toLocalDate();
+        LocalDate endDate = LocalDateTime.now().toLocalDate();
+
+        List<UserDto> currentWorkerListDto = userRepository.findByNowWorking(teamsId)
+                .stream()
+                .map(user -> UserDto.of(
+                        user.getId(),
+                        null,
+                        user.getNickname(),
+                        user.getProfileImage()
+                ))
+                .toList();
+
+        Optional<String> latestWorkContent = Optional.empty();
+        if (currentWorkerListDto.isEmpty()) {
+            Member currentMember = memberRepository.findByTeamAndUser(team, currentUser)
+                    .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_MEMBER));
+            latestWorkContent = workRepository.findByMemberAndLatestDate(currentMember.getId());
+        }
+
+        return TeamWorkStatusDto.of(
+                startDate.toString(),
+                endDate.toString(),
+                currentWorkerListDto,
+                latestWorkContent.orElse(null),
+                team.getName()
+        );
+    }
+
+    public RankingDto getRanking(Long userId, Long teamsId) {
 
         User currentUser = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
@@ -105,17 +150,89 @@ public class WorkService {
         if (!memberRepository.existsByUserAndTeam(currentUser, team))
             throw new CommonException(ErrorCode.NOT_FOUND_MEMBER);
 
-        List<Member> memberList = memberRepository.findAllByTeamOrderByTotalMinuteDesc(team);
-        List<RankingDto> rankingDtoList = memberList.stream()
-                .map(member -> RankingDto.of(
-                        member.getId(),
-                        member.getUser().getNickname(),
-                        member.getUser().getProfileImage(),
-                        member.getTotalMinute()
-                ))
-                .toList();
+        LocalDateTime startDate = DateUtil.getOneWeekAgoDate();
+        return RankingDto.of(
+                getWorkedDateRanking(teamsId, startDate),
+                getWorkedTimeRanking(teamsId, startDate),
+                getQuestionTimes(teamsId, startDate),
+                getFastAnswered(teamsId, startDate),
+                getDetailedBacklog(teamsId, startDate)
+        );
+    }
 
-        return RankingListDto.of(rankingDtoList, team.getName());
+    private List<RankingElementDto> getWorkedDateRanking(Long teamId, LocalDateTime startDate) {
+        return memberRepository.findAllByTeamAndStartDateOrderByWorkDay(teamId, startDate.toLocalDate())
+                .stream()
+                .map(object -> {
+                        Member tempMember = memberRepository.findById((Long) object[0])
+                                .orElseThrow(() -> new CommonException(ErrorCode.INTERNAL_SERVER_ERROR));
+                            return RankingElementDto.of(
+                                    MemberInfoDto.of(tempMember),
+                                    (Long) object[1]
+                            );
+                        }
+                )
+                .toList();
+    }
+
+    private List<RankingElementDto> getWorkedTimeRanking(Long teamId, LocalDateTime startDate) {
+        return memberRepository.findByAllByTeamAndStartDateOrderByWorkTime(teamId, startDate.toLocalDate())
+                .stream()
+                .map(object -> {
+                        Member tempMember = memberRepository.findById((Long) object[0])
+                                .orElseThrow(() -> new CommonException(ErrorCode.INTERNAL_SERVER_ERROR));
+                        return RankingElementDto.of(
+                                    MemberInfoDto.of(tempMember),
+                                    ((Number) object[1]).longValue()
+                            );
+                    }
+                )
+                .toList();
+    }
+
+    private List<RankingElementDto> getQuestionTimes(Long teamId, LocalDateTime startDate) {
+        return memberRepository.findByAllByTeamAndStartDateOrderByQuestionTimes(teamId, startDate.toLocalDate())
+                .stream()
+                .map(object -> {
+                        Member tempMember = memberRepository.findById((Long) object[0])
+                                .orElseThrow(() -> new CommonException(ErrorCode.INTERNAL_SERVER_ERROR));
+                        return RankingElementDto.of(
+                                    MemberInfoDto.of(tempMember),
+                                    (Long) object[1]
+                            );
+                    }
+                )
+                .toList();
+    }
+
+    private List<RankingElementDto> getFastAnswered(Long teamId, LocalDateTime startDate) {
+        return memberRepository.findByAllByTeamAndStartDateOrderByFastAnswered(teamId, startDate.toLocalDate())
+                .stream()
+                .map(object -> {
+                        Member tempMember = memberRepository.findById((Long) object[0])
+                                .orElseThrow(() -> new CommonException(ErrorCode.INTERNAL_SERVER_ERROR));
+                        return RankingElementDto.of(
+                                    MemberInfoDto.of(tempMember),
+                                    (Long) object[1]
+                            );
+                    }
+                )
+                .toList();
+    }
+
+    private List<RankingElementDto> getDetailedBacklog(Long teamId, LocalDateTime startDate) {
+        return memberRepository.findByAllByTeamAndStartDateOrderByDetailedBacklog(teamId, startDate.toLocalDate())
+                .stream()
+                .map(object -> {
+                        Member tempMember = memberRepository.findById((Long) object[0])
+                                .orElseThrow(() -> new CommonException(ErrorCode.INTERNAL_SERVER_ERROR));
+                        return RankingElementDto.of(
+                                    MemberInfoDto.of(tempMember),
+                                    ((Number) object[1]).longValue()
+                            );
+                    }
+                )
+                .toList();
     }
 
     public WorkManageListDto listManageWork(Long userId, Long membersId) {
