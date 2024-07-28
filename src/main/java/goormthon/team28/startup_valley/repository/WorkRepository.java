@@ -21,6 +21,16 @@ public interface WorkRepository extends JpaRepository<Work, Long> {
     List<Work> findAllByScrumOrderByEndAtDesc(Scrum scrum);
     List<Work> findAllByScrum(Scrum scrum);
 
+    @Query(
+            value = "SELECT w.content " +
+                    "FROM works w " +
+                    "WHERE member_id = :memberId " +
+                    "ORDER BY w.end_at DESC " +
+                    "LIMIT 1",
+            nativeQuery = true
+    )
+    Optional<String> findByMemberAndLatestDate(Long memberId);
+
     @Modifying(clearAutomatically = true)
     @Query("update Work w set w.content = :content, w.endAt = :now where w.id = :workId")
     void updateWorkAfterOver(Long workId, String content, LocalDateTime now);

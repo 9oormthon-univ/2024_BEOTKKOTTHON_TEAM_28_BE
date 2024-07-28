@@ -109,7 +109,7 @@ public class QuestionService {
                             question.getId(),
                             question.getSender().getUser().getNickname(),
                             question.getSender().getUser().getProfileImage(),
-                            member.getPart(),
+                            isReceived ? question.getSender().getPart() : member.getPart(),
                             question.getContent(),
                             question.getCreatedAt()
                     ),

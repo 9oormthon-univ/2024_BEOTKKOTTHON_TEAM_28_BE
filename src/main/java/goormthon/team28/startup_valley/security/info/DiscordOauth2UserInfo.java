@@ -13,4 +13,9 @@ public class DiscordOauth2UserInfo extends Oauth2UserInfo {
     public String getId() {
         return this.attributes.get("id").toString();
     }
+
+    @Override
+    public String getDiscordId() {
+        return this.attributes.get("username").toString();
+    }
 }

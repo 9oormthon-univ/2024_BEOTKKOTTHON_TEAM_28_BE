@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @RequiredArgsConstructor
 public class DiscordListener extends ListenerAdapter {
+
     private final UserService userService;
     private final TeamService teamService;
     private final MemberService memberService;
@@ -33,10 +34,13 @@ public class DiscordListener extends ListenerAdapter {
     private final WorkService workService;
     private final GptService gptService;
     private final ReviewService reviewService;
+
     @Override
     public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
+
         LocalDate nowLocalDate = LocalDate.now();
         LocalDateTime nowLocalDateTime = LocalDateTime.now();
+
         switch (event.getName()) {
             case "1-팀원업데이트":
                 // 봇을 제외한 사용자 목록 생성
@@ -55,9 +59,8 @@ public class DiscordListener extends ListenerAdapter {
                     log.info("멤버 생성 완료");
 
                     event.reply("팀 과 팀 멤버를 연결했어요! '파트입력하기' 명령어를 통해 역할을 알려주세요 !!").setEphemeral(true).queue();
-                } else {
+                } else
                     event.reply("웹에 회원가입이 필요합니다!\n\n" + "회원가입 해주세요 !! : " + noSignUp.toString()).setEphemeral(true).queue();
-                }
                 break;
 
             case "2-파트입력하기":
@@ -67,7 +70,7 @@ public class DiscordListener extends ListenerAdapter {
                 // 팀원 파트 입력하기
                 memberService.updatePart(me.getId(), part);
 
-                event.reply(event.getUser().getAsMention() + " 파트 입력까지 완료 되었습니다 !, 앞으로의 멋진 협업을 기대합니다 ! ")
+                event.reply(event.getUser().getAsMention() + " 파트 입력까지 완료 되었습니다 ! 앞으로의 멋진 협업을 기대합니다 ! ")
                         .setEphemeral(true).queue();
 
                 break;
@@ -397,65 +400,84 @@ public class DiscordListener extends ListenerAdapter {
                 break;
         }
     }
+
     public List<String> findNoSignUp(List<Member> members) {
+
         List<String> usersWithoutInfo = new ArrayList<>();
         for (Member member : members) {
-            String serialId = member.getUser().getName();
-            if (!userService.isExisted(serialId)) {
-                usersWithoutInfo.add(serialId);
-            }
+            String discordId = member.getUser().getName();
+            if (!userService.isExisted(discordId))
+                usersWithoutInfo.add(discordId);
         }
         return usersWithoutInfo;
     }
+
     private Team myTeam(SlashCommandInteractionEvent event){
         Optional<Team> optionalTeam = teamService.findByGuildId(event.getGuild().getId());
-        if (optionalTeam.isEmpty()){
+        if (optionalTeam.isEmpty())
             event.reply("팀원업데이트를 통해 팀을 만들어주세요 !").setEphemeral(true).queue();
-        }
         return optionalTeam.get();
     }
-    private goormthon.team28.startup_valley.domain.User getUser(SlashCommandInteractionEvent event, String userId){
-        Optional<goormthon.team28.startup_valley.domain.User> optionalUser = userService.findBySerialId(userId);
-        if (optionalUser.isEmpty()){
+
+    private goormthon.team28.startup_valley.domain.User getUser(
+            SlashCommandInteractionEvent event,
+            String userId
+    ){
+        Optional<goormthon.team28.startup_valley.domain.User> optionalUser = userService.findByDiscordId(userId);
+        if (optionalUser.isEmpty())
             event.reply("웹에 회원가입을 먼저 진행해주세요 !").setEphemeral(true).queue();
-        }
         return optionalUser.get();
     }
-    private goormthon.team28.startup_valley.domain.Member getMember(SlashCommandInteractionEvent event, String userId){
-        Optional<goormthon.team28.startup_valley.domain.Member> optionalMember = memberService.findByTeamAndUser(
-                myTeam(event),
-                getUser(event, userId)
-        );
-        if (optionalMember.isEmpty()){
-            event.reply("팀원을 조회할 수 없습니다 ㅠㅠ. 팀원 업데이트를 통해 변경 사항을 적용해주세요 ~ !").setEphemeral(true).queue();
-        }
+
+    private goormthon.team28.startup_valley.domain.Member getMember(
+            SlashCommandInteractionEvent event,
+            String userId
+    ){
+        Optional<goormthon.team28.startup_valley.domain.Member> optionalMember
+                = memberService.findByTeamAndUser(myTeam(event), getUser(event, userId));
+        if (optionalMember.isEmpty())
+            event.reply("팀원을 조회할 수 없습니다 ㅠㅠ. 팀원 업데이트를 통해 변경 사항을 적용해주세요 ~ !")
+                 .setEphemeral(true)
+                 .queue();
         return optionalMember.get();
     }
-    private Optional<Scrum> getProcessingScrum(SlashCommandInteractionEvent event, String userId){
+
+    private Optional<Scrum> getProcessingScrum(
+            SlashCommandInteractionEvent event,
+            String userId
+    ){
         Optional<Scrum> nowScrum = scrumService.findNowScrum(getMember(event, userId));
         if (nowScrum.isEmpty()){
-            event.reply("시작된 작업을 찾을 수 없습니다 ㅠㅠ, 작업을 먼저 시작해주세요").setEphemeral(true).queue();
+            event.reply("시작된 작업을 찾을 수 없습니다 ㅠㅠ, 작업을 먼저 시작해주세요")
+                 .setEphemeral(true)
+                 .queue();
         }
         return nowScrum;
     }
+
     private Optional<Work> getMyProcessingWork(SlashCommandInteractionEvent event){
         String userId = event.getUser().getName();
         return workService.findNotOverWork(getProcessingScrum(event, userId).get(), getMember(event, userId));
     }
-    public void saveOrGetMember(Team team, Member discordMember, SlashCommandInteractionEvent event) {
-        goormthon.team28.startup_valley.domain.Member teamMember = memberService.saveOrGetMember(
-                team,
-                getUser(event, discordMember.getUser().getName())
-        );
 
-        if (isTeamLeaderNotSet(team) && isGuildOwner(discordMember, event)) {
+    public void saveOrGetMember(
+            Team team,
+            Member discordMember,
+            SlashCommandInteractionEvent event
+    ) {
+        goormthon.team28.startup_valley.domain.Member teamMember
+                = memberService.saveOrGetMember(team, getUser(event, discordMember.getUser().getName()));
+
+        if (isTeamLeaderNotSet(team) && isGuildOwner(discordMember, event))
             teamService.updateLeader(team.getId(), teamMember);
-        }
     }
+
     public boolean isTeamLeaderNotSet(Team team) {
         return team.getLeader() == null;
     }
+
     public boolean isGuildOwner(Member discordMember, SlashCommandInteractionEvent event) {
-        return discordMember.getUser().getName().equals(event.getGuild().getOwner().getUser().getName());
+        return discordMember.getUser().getName()
+                .equals(event.getGuild().getOwner().getUser().getName());
     }
 }

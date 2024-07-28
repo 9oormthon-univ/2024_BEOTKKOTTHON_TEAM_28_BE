@@ -1,6 +1,7 @@
 package goormthon.team28.startup_valley.security.service;
 
 import goormthon.team28.startup_valley.domain.User;
+import goormthon.team28.startup_valley.dto.type.EProfileImage;
 import goormthon.team28.startup_valley.dto.type.EProvider;
 import goormthon.team28.startup_valley.dto.type.ERole;
 import goormthon.team28.startup_valley.repository.UserRepository;
@@ -30,6 +31,7 @@ public class CustomOauth2UserDetailService extends DefaultOAuth2UserService {
     public OAuth2User loadUser(
             OAuth2UserRequest userRequest
     ) throws OAuth2AuthenticationException {
+        log.info("Oauth2UserRequest 진입, userRequest = {}", userRequest);
         // provider 가져오기
         EProvider provider = EProvider.valueOf(
                 userRequest.getClientRegistration().getRegistrationId().toUpperCase()
@@ -52,8 +54,10 @@ public class CustomOauth2UserDetailService extends DefaultOAuth2UserService {
                                             bCryptPasswordEncoder
                                                     .encode(UUID.randomUUID().toString())
                                     )
-                                    .provider(provider)
+                                    .discordId(oauth2UserInfo.getDiscordId())
                                     .role(ERole.USER)
+                                    .profileImage(EProfileImage.TOMATO)
+                                    .provider(provider)
                                     .build()
                     );
                     return UserRepository.UserSecurityForm.invoke(newUser);
