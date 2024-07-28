@@ -7,7 +7,7 @@ import java.util.List;
 
 @Getter
 public class GptRequest {
-    private final String model = "gpt-3.5-turbo";
+    private final String model = "gpt-3.5-turbo-0125";
     private List<Message> messages;
     private final int max_tokens = 256;
     private double temperature;
