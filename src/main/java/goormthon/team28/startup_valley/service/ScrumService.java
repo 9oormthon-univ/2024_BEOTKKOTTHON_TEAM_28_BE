@@ -87,6 +87,7 @@ public class ScrumService {
                         scrum.getSummary(),
                         scrum.getStartAt(),
                         scrum.getEndAt(),
+                        targetMember.getTotalMinute(),
                         workRepository.findAllByScrumOrderByEndAtDesc(scrum)
                                 .stream()
                                 .limit(3)
