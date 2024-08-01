@@ -15,6 +15,8 @@ public record MemberContributionDto(
         String part,
         @JsonProperty("peerReviewSummary")
         String peerReviewSummary,
+        @JsonProperty("isPublic")
+        boolean isPublic,
         @JsonProperty("scrumList")
         List<ScrumContributionDto> scrumContributionDtoList
 ) implements Serializable {
@@ -22,12 +24,14 @@ public record MemberContributionDto(
                 final Long totalMinute,
                 final EPart ePart,
                 final String peerReviewSummary,
+                final boolean isPublic,
                 final List<ScrumContributionDto> scrumContributionDtoList
         ) {
                 return MemberContributionDto.builder()
                         .totalMinute(totalMinute)
                         .part(ePart.getName())
                         .peerReviewSummary(peerReviewSummary)
+                        .isPublic(isPublic)
                         .scrumContributionDtoList(scrumContributionDtoList)
                         .build();
         }
