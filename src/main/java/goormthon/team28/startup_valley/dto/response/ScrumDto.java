@@ -17,6 +17,8 @@ public record ScrumDto(
         String startAt,
         @JsonProperty("endAt")
         String endAt,
+        @JsonProperty("totalTime")
+        Long totalTime,
         @JsonProperty("workList")
         List<WorkForScrumDto> workForScrumDtoList
 ) implements Serializable {
@@ -25,6 +27,7 @@ public record ScrumDto(
                 final String content,
                 final LocalDate startAt,
                 final LocalDate endAt,
+                final Long totalTime,
                 final List<WorkForScrumDto> workForScrumDtoList
         ) {
                 return ScrumDto.builder()
@@ -32,6 +35,7 @@ public record ScrumDto(
                         .content(content)
                         .startAt(startAt.toString())
                         .endAt(endAt.toString())
+                        .totalTime(totalTime)
                         .workForScrumDtoList(workForScrumDtoList)
                         .build();
         }

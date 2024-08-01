@@ -139,12 +139,14 @@ public class TeamService {
         List<TeamRetrieveDto> teamRetrieveDtoList = memberStream
                 .map(member -> TeamRetrieveDto.of(
                         member.getTeam().getId(),
+                        member.getId(),
                         member.getTeam().getName(),
                         member.getRetrospection(),
                         member.getTeam().getTeamImage(),
                         member.getTeam().getStartAt(),
                         member.getTeam().getEndAt(),
-                        member.getTeam().getStatus()
+                        member.getTeam().getStatus(),
+                        member.getIsPublic()
                 ))
                 .toList();
 
