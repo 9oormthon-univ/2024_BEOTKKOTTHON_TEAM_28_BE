@@ -157,9 +157,6 @@ public class WorkService {
         if (!memberRepository.existsByUserAndTeam(currentUser, team))
             throw new CommonException(ErrorCode.MISMATCH_LOGIN_USER_AND_TEAM);
 
-        LocalDate startDate = DateUtil.getOneWeekAgoDate().toLocalDate();
-        LocalDate endDate = LocalDateTime.now().toLocalDate();
-
         LocalDateTime startDate = DateUtil.getOneWeekAgoDate();
         return RankingDto.of(
                 getWorkedDateRanking(teamsId, startDate),
