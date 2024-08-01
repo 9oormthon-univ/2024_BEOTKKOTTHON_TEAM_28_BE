@@ -145,7 +145,8 @@ public class TeamService {
                         member.getTeam().getTeamImage(),
                         member.getTeam().getStartAt(),
                         member.getTeam().getEndAt(),
-                        member.getTeam().getStatus()
+                        member.getTeam().getStatus(),
+                        member.getIsPublic()
                 ))
                 .toList();
 

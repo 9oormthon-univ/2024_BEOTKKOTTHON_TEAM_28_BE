@@ -25,7 +25,9 @@ public record TeamRetrieveDto(
         @JsonProperty("endAt")
         String endAt,
         @JsonProperty("status")
-        String status
+        String status,
+        @JsonProperty("isPublic")
+        boolean isPublic
 ) implements Serializable {
     public static TeamRetrieveDto of(
             final Long id,
@@ -36,7 +38,8 @@ public record TeamRetrieveDto(
             final LocalDate startAt,
             @Nullable
             final LocalDate endAt,
-            final EProjectStatus eProjectStatus
+            final EProjectStatus eProjectStatus,
+            final boolean isPublic
     ) {
         return TeamRetrieveDto.builder()
                 .id(id)
@@ -47,6 +50,7 @@ public record TeamRetrieveDto(
                 .startAt(startAt.toString())
                 .endAt(endAt != null ? endAt.toString() : null)
                 .status(eProjectStatus.getStatus())
+                .isPublic(isPublic)
                 .build();
     }
 }
