@@ -24,6 +24,7 @@ public enum ErrorCode {
     INVALID_QUERY_PARAMETER(40012, HttpStatus.BAD_REQUEST, "유효하지 않는 쿼리 파라미터입니다."),
     MISMATCH_TEAM_AND_MEMBER(40013, HttpStatus.BAD_REQUEST, "팀과 멤버가 일치하지 않습니다."),
     INVALID_LOGIN_USER_AND_TARGET_MEMBER(40014, HttpStatus.BAD_REQUEST, "로그인 사용자는 타겟 사용자와 같은 팀이 아닙니다."),
+    NOT_ASSOCIATE_LOGIN_USER_AND_TARGET_MEMBER(40015, HttpStatus.BAD_REQUEST, "로그인 사용자는 타겟 사용자와 연관 관계가 없습니다."),
 
     //401
     INVALID_HEADER_VALUE(40100, HttpStatus.UNAUTHORIZED, "올바르지 않은 헤더값입니다."),

@@ -48,53 +48,55 @@ public class ScrumService {
         scrumRepository.updateScrumAfterOver(scrumId, summary, EScrumStatus.FINISH, now);
     }
 
-    public ScrumListDto listScrum(Long userId, Long teamsId, Long target) {
+    public ScrumListDto listScrum(Long userId, Long membersId, Long teamsId) {
 
         User currentUser = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
         Team targetTeam = teamRepository.findById(teamsId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_TEAM));
-        if (!memberRepository.existsByUserAndTeam(currentUser, targetTeam))
-            throw new CommonException(ErrorCode.MISMATCH_LOGIN_USER_AND_TEAM);
+//        if (!memberRepository.existsByUserAndTeam(currentUser, targetTeam))
+//            throw new CommonException(ErrorCode.MISMATCH_LOGIN_USER_AND_TEAM);
 
-        List<Member> memberList = new ArrayList<>();
-        Member targetMember;
-        if (target == null)
-            memberList = memberRepository.findAllByTeam(targetTeam);
-        else {
-            targetMember = memberRepository.findById(target)
-                            .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_MEMBER));
-            if (!targetMember.getTeam().equals(targetTeam))
-                throw new CommonException(ErrorCode.MISMATCH_TEAM_AND_MEMBER);
-            memberList.add(
-                    memberRepository.findById(target)
-                            .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_MEMBER))
-            );
-        }
+        // Target Member와 Team이 일치하는지 검증 로직
+        Member targetMember = memberRepository.findById(membersId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_MEMBER));
+        if (!targetMember.getTeam().equals(targetTeam))
+            throw new CommonException(ErrorCode.MISMATCH_TEAM_AND_MEMBER);
 
-        List<ScrumDto> scrumDtoList = new ArrayList<>();
-        for (Member tempMember : memberList) {
-            List<Scrum> scrumList = scrumRepository
-                    .findAllByWorkerAndStatus(tempMember, EScrumStatus.FINISH);
-            scrumDtoList.addAll(
-                    scrumList.stream()
-                            .map(scrum -> ScrumDto.of(
-                                    scrum.getId(),
-                                    scrum.getSummary(),
-                                    scrum.getStartAt(),
-                                    scrum.getEndAt(),
-                                    workRepository.findAllByScrumOrderByEndAtDesc(scrum)
-                                            .stream()
-                                            .limit(3)
-                                            .map(work -> WorkForScrumDto.of(
-                                                    work.getId(),
-                                                    work.getContent()
-                                            ))
-                                            .toList()
-                            ))
-                            .toList()
-            );
-        }
+        // Target Member와  로그인 한 유저가 연관이 있는지 검증 로직
+        User targetUser = targetMember.getUser();
+        List<Member> targetMemberList = memberRepository.findAllByUser(targetUser);
+        List<Member> currentMemberList = memberRepository.findAllByUser(currentUser);
+        boolean isLoginUserAndTargetAreAssociated = false;
+        for (Member tempTargetMember : targetMemberList)
+            for (Member tempCurrentMember : currentMemberList)
+                if (tempTargetMember.getTeam().equals(tempCurrentMember.getTeam())) {
+                    isLoginUserAndTargetAreAssociated = true;
+                    break;
+                }
+        if (!isLoginUserAndTargetAreAssociated)
+            throw new CommonException(ErrorCode.NOT_ASSOCIATE_LOGIN_USER_AND_TARGET_MEMBER);
+
+        boolean isTargetMemberPublic = targetMember.getIsPublic();
+
+        List<Scrum> scrumList = scrumRepository
+                .findAllByWorkerAndStatus(targetMember, EScrumStatus.FINISH);
+        List<ScrumDto> scrumDtoList = scrumList.stream()
+                .map(scrum -> ScrumDto.of(
+                        scrum.getId(),
+                        scrum.getSummary(),
+                        scrum.getStartAt(),
+                        scrum.getEndAt(),
+                        workRepository.findAllByScrumOrderByEndAtDesc(scrum)
+                                .stream()
+                                .limit(3)
+                                .map(work -> WorkForScrumDto.of(
+                                        work.getId(),
+                                        work.getContent()
+                                ))
+                                .toList()
+                ))
+                .toList();
         scrumDtoList = scrumDtoList.stream()
                 .sorted(Comparator.comparing(ScrumDto::endAt).reversed())
                 .toList();
