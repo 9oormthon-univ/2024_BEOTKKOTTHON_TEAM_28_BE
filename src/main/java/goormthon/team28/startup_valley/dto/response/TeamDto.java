@@ -9,6 +9,8 @@ import java.io.Serializable;
 public record TeamDto(
         @JsonProperty("id")
         Long id,
+        @JsonProperty("memberId")
+        Long memberId,
         @JsonProperty("name")
         String name,
         @JsonProperty("image")
@@ -16,11 +18,13 @@ public record TeamDto(
 ) implements Serializable {
         public static TeamDto of(
                 final Long id,
+                final Long memberId,
                 final String name,
                 final String image
         ) {
             return TeamDto.builder()
                     .id(id)
+                    .memberId(memberId)
                     .name(name)
                     .image(image)
                     .build();

@@ -13,12 +13,12 @@ public class ScrumController {
 
     private final ScrumService scrumService;
 
-    @GetMapping("/teams/{teamsId}/scrums")
+    @GetMapping("/members/{membersId}/teams/{teamsId}/scrums")
     public ResponseDto<?> listScrum(
             @UserId Long userId,
-            @PathVariable Long teamsId,
-            @RequestParam(required = false) Long target
+            @PathVariable Long membersId,
+            @PathVariable Long teamsId
     ) {
-        return ResponseDto.ok(scrumService.listScrum(userId, teamsId, target));
+        return ResponseDto.ok(scrumService.listScrum(userId, membersId, teamsId));
     }
 }

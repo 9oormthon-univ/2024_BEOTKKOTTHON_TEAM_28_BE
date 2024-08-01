@@ -132,6 +132,7 @@ public class MemberService {
                 targetMember.getTotalMinute(),
                 targetMember.getPart(),
                 targetMember.getPeerReviewSummary(),
+                targetMember.getIsPublic(),
                 scrumContributionDtoList
         );
     }

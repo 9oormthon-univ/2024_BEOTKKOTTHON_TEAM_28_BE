@@ -77,6 +77,11 @@ public class TeamService {
                 .filter(team -> !team.getStatus().equals(EProjectStatus.FINISH))
                 .map(team -> TeamDto.of(
                         team.getId(),
+                        memberRepository.findByTeamAndUser(team, currentUser)
+                                .orElseThrow(() ->
+                                        new CommonException(ErrorCode.MISMATCH_LOGIN_USER_AND_TEAM)
+                                )
+                                .getId(),
                         team.getName(),
                         team.getTeamImage()
                 ))
@@ -85,6 +90,11 @@ public class TeamService {
                 .filter(team -> team.getStatus().equals(EProjectStatus.FINISH))
                 .map(team -> TeamDto.of(
                         team.getId(),
+                        memberRepository.findByTeamAndUser(team, currentUser)
+                                .orElseThrow(() ->
+                                        new CommonException(ErrorCode.MISMATCH_LOGIN_USER_AND_TEAM)
+                                )
+                                .getId(),
                         team.getName(),
                         team.getTeamImage()
                 ))
@@ -129,12 +139,14 @@ public class TeamService {
         List<TeamRetrieveDto> teamRetrieveDtoList = memberStream
                 .map(member -> TeamRetrieveDto.of(
                         member.getTeam().getId(),
+                        member.getId(),
                         member.getTeam().getName(),
                         member.getRetrospection(),
                         member.getTeam().getTeamImage(),
                         member.getTeam().getStartAt(),
                         member.getTeam().getEndAt(),
-                        member.getTeam().getStatus()
+                        member.getTeam().getStatus(),
+                        member.getIsPublic()
                 ))
                 .toList();
 
