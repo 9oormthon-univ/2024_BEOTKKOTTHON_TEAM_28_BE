@@ -12,6 +12,8 @@ import java.time.LocalDate;
 public record TeamRetrieveDto(
         @JsonProperty("id")
         Long id,
+        @JsonProperty("memberId")
+        Long memberId,
         @JsonProperty("name")
         String name,
         @JsonProperty("summary")
@@ -27,6 +29,7 @@ public record TeamRetrieveDto(
 ) implements Serializable {
     public static TeamRetrieveDto of(
             final Long id,
+            final Long memberId,
             final String name,
             final String retrospection,
             final String profileImage,
@@ -37,6 +40,7 @@ public record TeamRetrieveDto(
     ) {
         return TeamRetrieveDto.builder()
                 .id(id)
+                .memberId(memberId)
                 .name(name)
                 .retrospection(retrospection)
                 .profileImage(profileImage)
