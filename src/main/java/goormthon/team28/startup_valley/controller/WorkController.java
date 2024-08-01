@@ -2,6 +2,7 @@ package goormthon.team28.startup_valley.controller;
 
 import goormthon.team28.startup_valley.annotation.UserId;
 import goormthon.team28.startup_valley.dto.global.ResponseDto;
+import goormthon.team28.startup_valley.dto.request.WorkCreateDto;
 import goormthon.team28.startup_valley.dto.request.WorkTimeDto;
 import goormthon.team28.startup_valley.service.WorkService;
 import lombok.RequiredArgsConstructor;
@@ -46,6 +47,14 @@ public class WorkController {
             @RequestBody WorkTimeDto workTimeDto
             ) {
         return ResponseDto.ok(workService.patchManageWork(userId, membersId, worksId, workTimeDto));
+    }
+
+    @PostMapping("/members/{membersId}/works")
+    public ResponseDto<?> createWork(
+            @UserId Long userId,
+            @PathVariable Long membersId,
+            @RequestBody WorkCreateDto workCreateDto) {
+        return ResponseDto.created(workService.createWork(userId, membersId, workCreateDto));
     }
 
     @GetMapping("/members/{membersId}/works/measure-one")

@@ -43,4 +43,9 @@ public class Work {
         this.startAt = startAt;
         this.endAt = endAt;
     }
+
+    public void updateContent(String content) {
+        this.content = content;
+        this.endAt = LocalDateTime.now();
+    }
 }
