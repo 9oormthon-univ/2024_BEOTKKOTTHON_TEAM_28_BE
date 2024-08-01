@@ -155,7 +155,10 @@ public class WorkService {
 
         // 해당 팀의 멤버가 아닐 수도 있는 경우 체크
         if (!memberRepository.existsByUserAndTeam(currentUser, team))
-            throw new CommonException(ErrorCode.NOT_FOUND_MEMBER);
+            throw new CommonException(ErrorCode.MISMATCH_LOGIN_USER_AND_TEAM);
+
+        LocalDate startDate = DateUtil.getOneWeekAgoDate().toLocalDate();
+        LocalDate endDate = LocalDateTime.now().toLocalDate();
 
         LocalDateTime startDate = DateUtil.getOneWeekAgoDate();
         return RankingDto.of(
