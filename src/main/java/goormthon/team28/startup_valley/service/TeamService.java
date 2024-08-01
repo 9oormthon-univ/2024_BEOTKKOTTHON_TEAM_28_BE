@@ -77,6 +77,11 @@ public class TeamService {
                 .filter(team -> !team.getStatus().equals(EProjectStatus.FINISH))
                 .map(team -> TeamDto.of(
                         team.getId(),
+                        memberRepository.findByTeamAndUser(team, currentUser)
+                                .orElseThrow(() ->
+                                        new CommonException(ErrorCode.MISMATCH_LOGIN_USER_AND_TEAM)
+                                )
+                                .getId(),
                         team.getName(),
                         team.getTeamImage()
                 ))
@@ -85,6 +90,11 @@ public class TeamService {
                 .filter(team -> team.getStatus().equals(EProjectStatus.FINISH))
                 .map(team -> TeamDto.of(
                         team.getId(),
+                        memberRepository.findByTeamAndUser(team, currentUser)
+                                .orElseThrow(() ->
+                                        new CommonException(ErrorCode.MISMATCH_LOGIN_USER_AND_TEAM)
+                                )
+                                .getId(),
                         team.getName(),
                         team.getTeamImage()
                 ))
