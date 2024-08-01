@@ -1,9 +1,11 @@
 package goormthon.team28.startup_valley.service;
 
 import goormthon.team28.startup_valley.domain.*;
+import goormthon.team28.startup_valley.dto.request.WorkCreateDto;
 import goormthon.team28.startup_valley.dto.request.WorkTimeDto;
 import goormthon.team28.startup_valley.dto.response.*;
 import goormthon.team28.startup_valley.dto.type.EPart;
+import goormthon.team28.startup_valley.dto.type.EScrumStatus;
 import goormthon.team28.startup_valley.exception.CommonException;
 import goormthon.team28.startup_valley.exception.ErrorCode;
 import goormthon.team28.startup_valley.repository.*;
@@ -28,6 +30,7 @@ public class WorkService {
     private final MemberRepository memberRepository;
     private final TeamRepository teamRepository;
     private final WorkRepository workRepository;
+    private final ScrumRepository scrumRepository;
 
     @Transactional
     public Work saveWork(Scrum scrum, Member member, LocalDateTime now){
@@ -75,6 +78,7 @@ public class WorkService {
             case "back" -> memberList = memberRepository.findAllByTeamAndPart(team, EPart.BACKEND);
             case "pm" -> memberList = memberRepository.findAllByTeamAndPart(team, EPart.PM);
             case "design" -> memberList = memberRepository.findAllByTeamAndPart(team, EPart.DESIGN);
+            case "fullstack" -> memberList = memberRepository.findAllByTeamAndPart(team, EPart.FULLSTACK);
             default -> throw new CommonException(ErrorCode.INVALID_QUERY_PARAMETER);
         }
 
@@ -113,14 +117,17 @@ public class WorkService {
         LocalDate startDate = DateUtil.getOneWeekAgoDate().toLocalDate();
         LocalDate endDate = LocalDateTime.now().toLocalDate();
 
-        List<UserDto> currentWorkerListDto = userRepository.findByNowWorking(teamsId)
+        List<UserWorkDto> currentWorkerListDto = userRepository.findByNowWorking(teamsId)
                 .stream()
-                .map(user -> UserDto.of(
-                        user.getId(),
-                        null,
-                        user.getNickname(),
-                        user.getProfileImage()
-                ))
+                .map(user -> UserWorkDto.of(
+                            user.getId(),
+                            user.getNickname(),
+                            user.getProfileImage().getName(),
+                            memberRepository.findByTeamAndUser(team, user)
+                                    .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_MEMBER))
+                                    .getPart().getName()
+                        )
+                )
                 .toList();
 
         Optional<String> latestWorkContent = Optional.empty();
@@ -148,7 +155,10 @@ public class WorkService {
 
         // 해당 팀의 멤버가 아닐 수도 있는 경우 체크
         if (!memberRepository.existsByUserAndTeam(currentUser, team))
-            throw new CommonException(ErrorCode.NOT_FOUND_MEMBER);
+            throw new CommonException(ErrorCode.MISMATCH_LOGIN_USER_AND_TEAM);
+
+        LocalDate startDate = DateUtil.getOneWeekAgoDate().toLocalDate();
+        LocalDate endDate = LocalDateTime.now().toLocalDate();
 
         LocalDateTime startDate = DateUtil.getOneWeekAgoDate();
         return RankingDto.of(
@@ -355,5 +365,45 @@ public class WorkService {
                 maxTime.orElse(0L),
                 workDateDtoList
         );
+    }
+
+    @Transactional
+    public Boolean createWork(Long userId, Long membersId, WorkCreateDto workCreateDto) {
+
+        User currentUser = userRepository.findById(userId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+        Member targetMember = memberRepository.findById(membersId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_MEMBER));
+        Team targetTeam = targetMember.getTeam();
+
+        if (!memberRepository.existsByUserAndTeam(currentUser, targetTeam))
+            throw new CommonException(ErrorCode.MISMATCH_LOGIN_USER_AND_MEMBER);
+
+        Optional<Work> optionalWork =  workRepository.findByOwnerAndEndAtIsNull(targetMember);
+        Work work;
+        if (optionalWork.isPresent()) {
+            work = optionalWork.get();
+            work.updateContent(workCreateDto.content());
+            return Boolean.TRUE;
+        }
+
+        Optional<Scrum> optionalScrum
+                = scrumRepository.findByWorkerAndStatus(targetMember, EScrumStatus.IN_PROGRESS);
+
+        Scrum scrum = optionalScrum.orElseGet(() -> scrumRepository.save(
+                Scrum.builder()
+                        .worker(targetMember)
+                        .startAt(LocalDate.now())
+                        .build()
+        ));
+
+        workRepository.save(
+                Work.builder()
+                        .owner(targetMember)
+                        .scrum(scrum)
+                        .startAt(LocalDateTime.now())
+                        .build()
+        );
+        return Boolean.TRUE;
     }
 }

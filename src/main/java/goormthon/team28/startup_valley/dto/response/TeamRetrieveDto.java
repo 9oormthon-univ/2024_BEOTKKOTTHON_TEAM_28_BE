@@ -12,6 +12,8 @@ import java.time.LocalDate;
 public record TeamRetrieveDto(
         @JsonProperty("id")
         Long id,
+        @JsonProperty("memberId")
+        Long memberId,
         @JsonProperty("name")
         String name,
         @JsonProperty("summary")
@@ -23,26 +25,32 @@ public record TeamRetrieveDto(
         @JsonProperty("endAt")
         String endAt,
         @JsonProperty("status")
-        String status
+        String status,
+        @JsonProperty("isPublic")
+        boolean isPublic
 ) implements Serializable {
     public static TeamRetrieveDto of(
             final Long id,
+            final Long memberId,
             final String name,
             final String retrospection,
             final String profileImage,
             final LocalDate startAt,
             @Nullable
             final LocalDate endAt,
-            final EProjectStatus eProjectStatus
+            final EProjectStatus eProjectStatus,
+            final boolean isPublic
     ) {
         return TeamRetrieveDto.builder()
                 .id(id)
+                .memberId(memberId)
                 .name(name)
                 .retrospection(retrospection)
                 .profileImage(profileImage)
                 .startAt(startAt.toString())
                 .endAt(endAt != null ? endAt.toString() : null)
                 .status(eProjectStatus.getStatus())
+                .isPublic(isPublic)
                 .build();
     }
 }
