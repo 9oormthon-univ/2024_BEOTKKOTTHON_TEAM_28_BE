@@ -85,7 +85,7 @@ public class ReviewService {
         if (currentMember.equals(targetMember))
             throw new CommonException(ErrorCode.INVALID_CREATE_PEER_REVIEW_SELF);
         // 이미 리뷰를 작성한 경우 예외 처리
-        if (reviewRepository.existsBySender(currentMember))
+        if (reviewRepository.existsBySenderAndReceiver(currentMember, targetMember))
             throw new CommonException(ErrorCode.INVALID_CREATE_PEER_REVIEW_OTHER);
         // 서로 팀이 다른 경우
         if (!targetMember.getTeam().equals(team))
