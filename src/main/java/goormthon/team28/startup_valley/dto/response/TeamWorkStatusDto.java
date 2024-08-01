@@ -14,7 +14,7 @@ public record TeamWorkStatusDto (
         @JsonProperty("endDate")
         String endDate,
         @JsonProperty("currentWorkerList")
-        List<UserDto> currentWorkerList,
+        List<UserWorkDto> currentWorkerList,
         @Nullable
         @JsonProperty("latestWork")
         String latestWork,
@@ -24,7 +24,7 @@ public record TeamWorkStatusDto (
     public static TeamWorkStatusDto of(
             final String startDate,
             final String endDate,
-            final List<UserDto> currentWorkerList,
+            final List<UserWorkDto> currentWorkerList,
             final String latestWork,
             final String projectName
     ) {
