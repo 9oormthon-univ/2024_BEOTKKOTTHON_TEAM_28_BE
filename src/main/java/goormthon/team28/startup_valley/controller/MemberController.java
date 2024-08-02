@@ -19,6 +19,11 @@ public class MemberController {
         return ResponseDto.ok(memberService.listTeamMember(userId, teamsId));
     }
 
+    @GetMapping("/teams/{teamsId}/members/member-id")
+    public ResponseDto<?> getMemberId(@UserId Long userId, @PathVariable Long teamsId) {
+        return ResponseDto.ok(memberService.getMemberId(userId, teamsId));
+    }
+
     @PatchMapping("/members/{membersId}")
     public ResponseDto<?> toggleTeamPublic(@UserId Long userId, @PathVariable Long membersId) {
         return ResponseDto.ok(memberService.toggleTeamPublic(userId, membersId));
