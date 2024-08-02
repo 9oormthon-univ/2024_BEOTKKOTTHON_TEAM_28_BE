@@ -130,7 +130,7 @@ public class MemberService {
 
         return MemberContributionDto.of(
                 targetMember.getTotalMinute(),
-                targetMember.getPart(),
+                targetMember.getPart() != null ? targetMember.getPart() : EPart.UNSELECTED,
                 targetMember.getPeerReviewSummary(),
                 targetMember.getIsPublic(),
                 scrumContributionDtoList
