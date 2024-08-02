@@ -50,7 +50,7 @@ public class MemberService {
                 .map(member -> MemberDto.of(
                         member.getId(),
                         member.getUser().getNickname(),
-                        member.getPart(),
+                        member.getPart() != null ? member.getPart() : EPart.UNSELECTED,
                         member.getUser().getProfileImage()
                 ))
                 .toList();
