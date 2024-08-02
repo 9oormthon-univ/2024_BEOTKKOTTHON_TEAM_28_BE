@@ -44,7 +44,8 @@ public class StartupValleyApplication {
 								context.getBean(ScrumService.class),
 								context.getBean(WorkService.class),
 								context.getBean(GptService.class),
-								context.getBean(ReviewService.class)
+								context.getBean(ReviewService.class),
+								context.getBean(EmailService.class)
 						)
 				)
 				.build();
@@ -75,7 +76,10 @@ public class StartupValleyApplication {
 						.addOption(OptionType.USER, "receiver", "동료평가의 피평가자를 선택해주세요", true),
 				Commands.slash("전체업무정리하기", "프로젝트 전체 기간 동안 본인의 업무를 간략하게 적어주세요.")
 						.addOption(OptionType.STRING, "content", "프로젝트에서의 본인의 역할에 대해 작성해주세요", true),
-				Commands.slash("도움말", "Startup Valley 프로덕트를 사용하시기 시작한 여러분들을 위한 안내서입니다. 📖🍀")
+				Commands.slash("도움말", "Startup Valley 프로덕트를 사용하시기 시작한 여러분들을 위한 안내서입니다. 📖🍀"),
+				Commands.slash("문의하기", "해결이 어려운 문제나, 새로운 문의가 있다면 사용해 주세요!")
+						.addOption(OptionType.STRING, "email", "회신 받으실 이메일 내용을 작성해주세요!", true)
+						.addOption(OptionType.STRING, "content", "문의하실 내용을 작성해주세요!", true)
 		).queue();
 	}
 }
