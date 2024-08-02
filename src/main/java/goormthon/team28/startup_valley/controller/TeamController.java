@@ -33,6 +33,15 @@ public class TeamController {
         return ResponseDto.ok(teamService.retrieveTeam(userId, teamsId));
     }
 
+    @GetMapping("/members/{membersId}/teams/{teamsId}")
+    public ResponseDto<?> retrieveTeam(
+            @UserId Long userId,
+            @PathVariable Long membersId,
+            @PathVariable Long teamsId
+    ) {
+        return ResponseDto.ok(teamService.retrieveMemberIdTeam(userId, membersId, teamsId));
+    }
+
     @GetMapping("/teams/{teamsId}/leader")
     public ResponseDto<?> listTeamMemberPermission(@UserId Long userId, @PathVariable Long teamsId) {
         return ResponseDto.ok(teamService.listTeamMemberPermission(userId, teamsId));
