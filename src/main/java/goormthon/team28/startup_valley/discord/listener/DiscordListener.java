@@ -34,6 +34,7 @@ public class DiscordListener extends ListenerAdapter {
     private final WorkService workService;
     private final GptService gptService;
     private final ReviewService reviewService;
+    private final EmailService emailService;
 
     @Override
     public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
@@ -396,6 +397,23 @@ public class DiscordListener extends ListenerAdapter {
                                 "2. 팀원의 동료 평가를 진행해요!\n" +
                                 "모든 팀원이 동료평가를 완료했다면, 모든 팀원이 작성한 본인의 AI로 요약된  동료 평가를 확인할 수 있어요."
                 ).setEphemeral(true).queue();
+
+                break;
+            case "문의하기":
+                goormthon.team28.startup_valley.domain.User currentUser = getUser(event, event.getUser().getName());
+                String userEmail = Objects.requireNonNull(event.getOption("email")).getAsString();
+                String content = Objects.requireNonNull(event.getOption("content")).getAsString();
+
+                event.deferReply().queue();
+                if (emailService.sendMail(currentUser, content, userEmail)) {
+                    event.getHook().sendMessage(
+                            "[서비스를 사용하시면서 불편함이 있으신가요?]\n" +
+                                    "연락 남겨주신 메일과 질문 내용을 확인해서, 하루 이내로 답변을 드릴 예정이에요!\n" +
+                                    "\n" +
+                                    "혹여나 불편한 것과 함께, 스타트업 밸리 팀이 여러분들께 더욱 좋은 기능을 제공해 드리기 위한 문의도 받고 있으니 편히 문의 부탁드려요!! \uD83D\uDE4C"
+                    ).queue();
+                } else
+                    event.getHook().sendMessage("이메일 발송에 실패하였습니다.").setEphemeral(false).queue();
 
                 break;
         }
