@@ -330,8 +330,12 @@ public class WorkService {
         Member targetMember = memberRepository.findById(membersId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_MEMBER));
         User targetUser = targetMember.getUser();
+
+        boolean isCurrentUserAndTargetUserSame = targetUser.getId().equals(userId);
         List<Member> memberList = memberRepository.findAllByUser(targetUser).stream()
-                .filter(Member::getIsPublic)
+                .filter(member ->
+                        isCurrentUserAndTargetUserSame || member.getIsPublic()
+                )
                 .toList();
 
         List<WorkDateDto> workDateDtoList = new ArrayList<>();
