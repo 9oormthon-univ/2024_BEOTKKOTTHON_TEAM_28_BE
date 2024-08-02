@@ -171,6 +171,36 @@ public class TeamService {
         );
     }
 
+    public TeamSummaryDto retrieveMemberIdTeam(Long userId, Long membersId, Long teamsId) {
+
+        User currentUser = userRepository.findById(userId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+        Team team = teamRepository.findById(teamsId).
+                orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_TEAM));
+        Member targetMember = memberRepository.findById(membersId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_MEMBER));
+
+        // Target Member와  로그인 한 유저가 연관이 있는지 검증 로직
+        User targetUser = targetMember.getUser();
+        List<Member> targetMemberList = memberRepository.findAllByUser(targetUser);
+        List<Member> currentMemberList = memberRepository.findAllByUser(currentUser);
+        boolean isLoginUserAndTargetAreAssociated = false;
+        for (Member tempTargetMember : targetMemberList)
+            for (Member tempCurrentMember : currentMemberList)
+                if (tempTargetMember.getTeam().equals(tempCurrentMember.getTeam())) {
+                    isLoginUserAndTargetAreAssociated = true;
+                    break;
+                }
+        if (!isLoginUserAndTargetAreAssociated)
+            throw new CommonException(ErrorCode.NOT_ASSOCIATE_LOGIN_USER_AND_TARGET_MEMBER);
+        return TeamSummaryDto.of(
+                team.getId(),
+                team.getName(),
+                team.getTeamImage(),
+                team.getStartAt()
+        );
+    }
+
     public TeamMemberPermissionListDto listTeamMemberPermission(Long userId, Long teamsId) {
 
         User currentUser = userRepository.findById(userId)
