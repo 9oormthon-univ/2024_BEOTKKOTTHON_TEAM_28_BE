@@ -9,6 +9,8 @@ public class Constants {
     public static String PREFIX_AUTH = "Authorization";
     public static String ACCESS_COOKIE_NAME = "access_token";
     public static String REFRESH_COOKIE_NAME = "refresh_token";
+    public static String EMAIL_TARGET = "m82630893@gmail.com";
+    public static String EMAIL_SUBJECT = "스타트업 밸리 문의 항목";
     public static String DISCORD_CONNECT_COMPLETE = "팀 과 팀 멤버를 연결했어요! '파트입력하기' 명령어를 통해 역할을 알려주세요 !!";
     public static String DISCORD_CONNECT_FAIL = "웹에 회원가입이 필요합니다!\n\n" + "회원가입 해주세요 !! : ";
     public static String DISCORD_INSERT_PART_COMPLETE = " 파트 입력까지 완료 되었습니다 !, 앞으로의 멋진 협업을 기대합니다 ! ";

@@ -53,7 +53,8 @@ public enum ErrorCode {
     NOT_FOUND_WORK(40406, HttpStatus.NOT_FOUND, "존재하지 않는 작업입니다."),
 
     //500
-    INTERNAL_SERVER_ERROR(50000, HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부 오류입니다")
+    INTERNAL_SERVER_ERROR(50000, HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부 오류입니다."),
+    MAIL_ERROR(50001, HttpStatus.INTERNAL_SERVER_ERROR, "메일 오류가 발생했습니다."),
 
     ;
     private final Integer code;
