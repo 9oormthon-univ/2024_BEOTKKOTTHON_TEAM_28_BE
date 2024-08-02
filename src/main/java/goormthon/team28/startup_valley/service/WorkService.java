@@ -234,8 +234,8 @@ public class WorkService {
                         Member tempMember = memberRepository.findById((Long) object[0])
                                 .orElseThrow(() -> new CommonException(ErrorCode.INTERNAL_SERVER_ERROR));
                         return RankingElementDto.of(
-                                    MemberInfoDto.of(tempMember),
-                                    ((Number) object[1]).longValue()
+                                MemberInfoDto.of(tempMember),
+                                (long) Math.floor(((Number) object[1]).doubleValue() / ((Number) object[2]).doubleValue())
                             );
                     }
                 )
@@ -330,8 +330,12 @@ public class WorkService {
         Member targetMember = memberRepository.findById(membersId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_MEMBER));
         User targetUser = targetMember.getUser();
+
+        boolean isCurrentUserAndTargetUserSame = targetUser.getId().equals(userId);
         List<Member> memberList = memberRepository.findAllByUser(targetUser).stream()
-                .filter(Member::getIsPublic)
+                .filter(member ->
+                        isCurrentUserAndTargetUserSame || member.getIsPublic()
+                )
                 .toList();
 
         List<WorkDateDto> workDateDtoList = new ArrayList<>();
