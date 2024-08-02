@@ -111,10 +111,11 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     @Query(
             value = "SELECT m.id, " +
-                    "COALESCE(w.len, 0) " +
+                    "COALESCE(w.len, 0), " +
+                    "COALESCE(w.counts, 0) " +
                     "FROM members m " +
                     "LEFT JOIN (" +
-                    "SELECT w.member_id, SUM(LENGTH(w.content)) AS len " +
+                    "SELECT w.member_id, SUM(LENGTH(w.content)) AS len, COUNT(w.content) AS counts " +
                     "FROM works w " +
                     "WHERE DATE(w.end_at) >= :startDate " +
                     "GROUP BY w.member_id" +

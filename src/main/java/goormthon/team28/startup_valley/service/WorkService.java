@@ -234,8 +234,8 @@ public class WorkService {
                         Member tempMember = memberRepository.findById((Long) object[0])
                                 .orElseThrow(() -> new CommonException(ErrorCode.INTERNAL_SERVER_ERROR));
                         return RankingElementDto.of(
-                                    MemberInfoDto.of(tempMember),
-                                    ((Number) object[1]).longValue()
+                                MemberInfoDto.of(tempMember),
+                                (long) Math.floor(((Number) object[1]).doubleValue() / ((Number) object[2]).doubleValue())
                             );
                     }
                 )
