@@ -15,7 +15,8 @@ public enum EPart {
     FRONTEND("FRONTEND"),
     FULLSTACK("FULLSTACK"),
     PM("PM"),
-    DESIGN("DESIGN");
+    DESIGN("DESIGN"),
+    UNSELECTED("UNSELECTED");
     private final String name;
 
     public static EPart fromName(String name, SlashCommandInteractionEvent event) {
