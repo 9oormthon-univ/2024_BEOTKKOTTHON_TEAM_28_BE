@@ -154,4 +154,16 @@ public class MemberService {
 
         return Boolean.TRUE;
     }
+
+    public Long getMemberId(Long userId, Long teamsId) {
+
+        User currentUser = userRepository.findById(userId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+        Team targetTeam = teamRepository.findById(teamsId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_TEAM));
+        Member currentMember = memberRepository.findByTeamAndUser(targetTeam, currentUser)
+                .orElseThrow(() -> new CommonException(ErrorCode.MISMATCH_LOGIN_USER_AND_TEAM));
+
+        return currentMember.getId();
+    }
 }
